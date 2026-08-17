@@ -2,19 +2,17 @@
   "name": "ui",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "src/index.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "tailwindcss": "^4.3.3"
-  },
   "dependencies": {
     "nativewind": "^4.2.6",
-    "@heroicons/react": "^2.0.18"
+    "@heroicons/react": "^2.0.18",
+    "tailwindcss": "^3.4.17"
   }
 }

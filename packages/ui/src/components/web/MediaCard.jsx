@@ -1,4 +1,4 @@
-import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon } from '../../icons';
+import { PlayIcon, BookmarkIcon, PlusIcon } from '../../icons';
 
 export default function MediaCard({ media }) {
   return (
@@ -6,13 +6,31 @@ export default function MediaCard({ media }) {
       {/* Media preview */}
       <div className="aspect-square w-full overflow-hidden">
         {media.type === 'video' ? (
-          <video src={media.src} className="w-full h-full object-cover" muted loop />
+          media.src ? (
+            <video src={media.src} className="w-full h-full object-cover" muted loop />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: media.color || '#e5e7eb' }}
+            >
+              <PlayIcon className="h-12 w-12 text-white" />
+            </div>
+          )
         ) : media.type === 'audio' ? (
           <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
             <PlayIcon className="h-12 w-12 text-white" />
           </div>
         ) : (
-          <img src={media.src} alt={media.title} className="w-full h-full object-cover" />
+          media.src ? (
+            <img src={media.src} alt={media.title} className="w-full h-full object-cover" />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: media.color || '#e5e7eb' }}
+            >
+              <span className="text-4xl">🖼️</span>
+            </div>
+          )
         )}
       </div>
 

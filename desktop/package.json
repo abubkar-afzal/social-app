@@ -1,0 +1,16 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "Desktop Application",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "electron": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}

@@ -1,8 +1,19 @@
+import React from 'react';
+import Link from 'next/link';
+
 export default function Footer() {
   return (
     <footer className="bg-surface border-t border-border mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-sm font-semibold text-text mb-4">Explore</h3>
+            <ul className="space-y-2 text-sm text-text-secondary">
+              <li><Link href="/videos" className="hover:text-primary">Videos</Link></li>
+              <li><Link href="/photos" className="hover:text-primary">Photos</Link></li>
+              <li><Link href="/audio" className="hover:text-primary">Audio</Link></li>
+            </ul>
+          </div>
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">About</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
@@ -20,21 +31,12 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-text mb-4">Legal</h3>
+            <h3 className="text-sm font-semibold text-text mb-4">Account</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li><a href="#" className="hover:text-primary">Terms</a></li>
-              <li><a href="#" className="hover:text-primary">Privacy</a></li>
-              <li><a href="#" className="hover:text-primary">Cookies</a></li>
+              <li><Link href="/login" className="hover:text-primary">Login</Link></li>
+              <li><Link href="/account" className="hover:text-primary">Profile</Link></li>
+              <li><a href="#" className="hover:text-primary">Settings</a></li>
             </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-text mb-4">Follow Us</h3>
-            <div className="flex space-x-4 text-text-secondary">
-              {/* Social icons can be added here */}
-              <a href="#" className="hover:text-primary" aria-label="Twitter">Twitter</a>
-              <a href="#" className="hover:text-primary" aria-label="Instagram">Instagram</a>
-              <a href="#" className="hover:text-primary" aria-label="YouTube">YouTube</a>
-            </div>
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-border text-center text-sm text-text-secondary">

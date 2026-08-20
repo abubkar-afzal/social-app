@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function MobileNavbar() {
   const [search, setSearch] = useState('');
+  const navigation = useNavigation();
 
   return (
-    <View className="bg-surface border-b border-border px-4 pt-10 pb-3">
+    <View className="bg-surface border-b border-border px-4 pb-3" style={{ paddingTop: Platform.OS === 'android' ? 20 : 0 }}>
       {/* Top row */}
       <View className="flex-row justify-between items-center mb-3">
-        <TouchableOpacity className="p-2">
+        <TouchableOpacity onPress={() => navigation.navigate('Home')} className="p-2">
           <Text className="text-2xl">🏠</Text>
         </TouchableOpacity>
         <Text className="text-xl font-bold text-primary">PinShare</Text>
-        <TouchableOpacity className="p-2">
+        <TouchableOpacity onPress={() => navigation.navigate('Account')} className="p-2">
           <Text className="text-2xl">🔔</Text>
         </TouchableOpacity>
       </View>
@@ -29,16 +31,29 @@ export default function MobileNavbar() {
         />
       </View>
 
-      {/* Bottom row */}
-      <View className="flex-row justify-between items-center">
-        <TouchableOpacity className="flex-row items-center bg-primary rounded-full py-2 px-4">
-          <Text className="text-white mr-1 text-lg">＋</Text>
-          <Text className="text-white font-semibold">Create</Text>
+      {/* Navigation tabs */}
+      {/* <View className="flex-row justify-around items-center">
+        <TouchableOpacity onPress={() => navigation.navigate('Home')} className="items-center">
+          <Text className="text-2xl">🏠</Text>
+          <Text className="text-xs text-text-secondary">Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="p-1 border-2 border-primary rounded-full">
-          <Text className="text-2xl text-primary">👤</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Videos')} className="items-center">
+          <Text className="text-2xl">🎬</Text>
+          <Text className="text-xs text-text-secondary">Videos</Text>
         </TouchableOpacity>
-      </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Photos')} className="items-center">
+          <Text className="text-2xl">🖼️</Text>
+          <Text className="text-xs text-text-secondary">Photos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Audio')} className="items-center">
+          <Text className="text-2xl">🎵</Text>
+          <Text className="text-xs text-text-secondary">Audio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Account')} className="items-center">
+          <Text className="text-2xl">👤</Text>
+          <Text className="text-xs text-text-secondary">Profile</Text>
+        </TouchableOpacity>
+      </View> */}
     </View>
   );
 }

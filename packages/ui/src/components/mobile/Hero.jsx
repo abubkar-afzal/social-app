@@ -1,39 +1,256 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useAudioPlayer } from 'expo-audio';
+import { useNavigation } from '@react-navigation/native';
+import { fetchMediaBatch } from '../../utils/mockData';
 
-const demoData = [
-  { id: '1', type: 'video', title: 'Nature', color: '#ff6b9d' },
-  { id: '2', type: 'photo', title: 'City', color: '#10b981' },
-  { id: '3', type: 'audio', title: 'Beats', color: '#f59e0b' },
-  { id: '4', type: 'photo', title: 'Mountains', color: '#3b82f6' },
-  { id: '5', type: 'video', title: 'Cooking', color: '#8b5cf6' },
-  { id: '6', type: 'photo', title: 'Art', color: '#ef4444' },
-];
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - 36) / 2;
 
-export default function MobileHero() {
-  const renderItem = ({ item }) => (
-    <TouchableOpacity className="flex-1 bg-surface rounded-xl overflow-hidden shadow-md" activeOpacity={0.8}>
-      <View className="aspect-square items-center justify-center" style={{ backgroundColor: item.color }}>
-        {item.type === 'video' && <Text className="text-4xl text-white">▶️</Text>}
-        {item.type === 'audio' && <Text className="text-4xl">🎵</Text>}
-        {item.type === 'photo' && <Text className="text-4xl">🖼️</Text>}
-      </View>
-      <Text className="p-2 text-sm font-medium text-text">{item.title}</Text>
-    </TouchableOpacity>
-  );
+// Skeleton Loader for Hero
+const HeroSkeleton = () => (
+  <View className="bg-surface rounded-xl overflow-hidden shadow-md mb-3" style={{ width: CARD_WIDTH }}>
+    <View className="aspect-square bg-border animate-pulse" />
+    <View className="p-2">
+      <View className="h-4 bg-border rounded mb-1 animate-pulse" />
+      <View className="h-3 bg-border rounded w-2/3 animate-pulse" />
+    </View>
+  </View>
+);
+
+// Video Card Component (Autoplay, muted)
+const VideoCard = ({ video, onPress }) => {
+  const player = useVideoPlayer(video.src, (player) => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
 
   return (
-    <View className="flex-1 bg-background px-3 pt-4">
-      <Text className="text-2xl font-bold text-text mb-4">Discover</Text>
-      <FlatList
-        data={demoData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ gap: 12, paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
+    <TouchableOpacity
+      className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+      style={{ width: CARD_WIDTH }}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
+      <VideoView
+        player={player}
+        style={{ width: '100%', aspectRatio: 1 }}
+        contentFit="cover"
       />
+      <View className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
+        <Text className="text-white text-sm font-medium" numberOfLines={1}>
+          {video.title}
+        </Text>
+        <Text className="text-white/70 text-xs">
+          {video.views} views
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+// Photo Card Component
+const PhotoCard = ({ photo, onPress }) => (
+  <TouchableOpacity
+    className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+    style={{ width: CARD_WIDTH }}
+    onPress={onPress}
+    activeOpacity={0.85}
+  >
+    <Image
+      source={{ uri: photo.src }}
+      style={{ width: '100%', aspectRatio: 1 }}
+      resizeMode="cover"
+    />
+    <View className="p-2">
+      <Text className="text-sm font-medium text-text" numberOfLines={1}>
+        {photo.title}
+      </Text>
+      <Text className="text-xs text-text-secondary">
+        {photo.views} views
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+// Audio Card Component
+const AudioCard = ({ audio, onPress }) => {
+  const player = useAudioPlayer({ uri: audio.src });
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      player.pause();
+    } else {
+      player.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  return (
+    <TouchableOpacity
+      className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+      style={{ width: CARD_WIDTH }}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
+      <View className="aspect-square items-center justify-center" style={{ backgroundColor: audio.color }}>
+        <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-4 mb-2">
+          <Text className="text-4xl">{isPlaying ? '⏸️' : '🎵'}</Text>
+        </TouchableOpacity>
+        <Text className="text-white font-medium px-2 text-center" numberOfLines={1}>
+          {audio.title}
+        </Text>
+      </View>
+      <View className="p-2">
+        <Text className="text-xs text-text-secondary">
+          {audio.views} views
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export default function MobileHero() {
+  const [heroItems, setHeroItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const flatListRef = useRef(null);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    loadInitialHero();
+  }, []);
+
+  const loadInitialHero = async () => {
+    setLoading(true);
+    const items = await fetchMediaBatch(0, 10);
+    setHeroItems(items);
+    setPage(1);
+    setHasMore(true);
+    setLoading(false);
+  };
+
+  const loadMoreHero = async () => {
+    if (loadingMore || !hasMore || loading) return;
+    setLoadingMore(true);
+    const items = await fetchMediaBatch(page, 10);
+    if (items.length === 0) {
+      setHasMore(false);
+    } else {
+      setHeroItems(prev => [...prev, ...items]);
+      setPage(prev => prev + 1);
+    }
+    setLoadingMore(false);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    const items = await fetchMediaBatch(0, 10);
+    setHeroItems(items);
+    setPage(1);
+    setHasMore(true);
+    setRefreshing(false);
+  };
+
+  const filteredItems = activeFilter === 'all'
+    ? heroItems
+    : heroItems.filter(item => item.type === activeFilter);
+
+  const renderHeroItem = ({ item }) => {
+    const onPress = () => navigation.navigate('MediaDetail', { mediaId: item.id, type: item.type });
+    
+    if (item.type === 'video') {
+      return <VideoCard video={item} onPress={onPress} />;
+    } else if (item.type === 'audio') {
+      return <AudioCard audio={item} onPress={onPress} />;
+    } else {
+      return <PhotoCard photo={item} onPress={onPress} />;
+    }
+  };
+
+  return (
+    <View className="flex-1 bg-background">
+      {loading ? (
+        <View className="flex-1">
+          {/* Header */}
+          <View className="px-4 pt-4 pb-2">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-2xl font-bold text-text">Discover</Text>
+              <TouchableOpacity className="bg-primary rounded-full px-4 py-2">
+                <Text className="text-white text-sm font-medium">✨ Trending</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="flex-row flex-wrap gap-3 px-3">
+            {[...Array(6)].map((_, i) => <HeroSkeleton key={i} />)}
+          </View>
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={filteredItems}
+          renderItem={renderHeroItem}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={{ gap: 12, paddingHorizontal: 12 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+          onEndReached={loadMoreHero}
+          onEndReachedThreshold={0.3}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+          ListHeaderComponent={
+            <View className="px-4 pt-4 pb-2">
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-2xl font-bold text-text">Discover</Text>
+                <TouchableOpacity className="bg-primary rounded-full px-4 py-2">
+                  <Text className="text-white text-sm font-medium">✨ Trending</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Filter Tabs */}
+              {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+                <View className="flex-row gap-2">
+                  {[
+                    { key: 'all', label: 'All' },
+                    { key: 'video', label: '🎬 Videos' },
+                    { key: 'photo', label: '🖼️ Photos' },
+                    { key: 'audio', label: '🎵 Audio' },
+                  ].map((filter) => (
+                    <TouchableOpacity
+                      key={filter.key}
+                      onPress={() => setActiveFilter(filter.key)}
+                      className={`px-5 py-2 rounded-full ${
+                        activeFilter === filter.key
+                          ? 'bg-primary'
+                          : 'bg-surface border border-border'
+                      }`}
+                    >
+                      <Text className={`font-medium ${
+                        activeFilter === filter.key ? 'text-white' : 'text-text'
+                      }`}>
+                        {filter.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView> */}
+            </View>
+          }
+          ListFooterComponent={loadingMore ? (
+            <View className="py-4">
+              <ActivityIndicator size="large" color="#e6005c" />
+            </View>
+          ) : null}
+        />
+      )}
     </View>
   );
 }

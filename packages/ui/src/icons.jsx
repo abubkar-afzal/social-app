@@ -1,4 +1,3 @@
-// packages/ui/src/icons.jsx
 export {
   HomeIcon,
   VideoCameraIcon as VideoIcon,
@@ -16,5 +15,31 @@ export {
   SpeakerXMarkIcon,
   ForwardIcon,
   BackwardIcon,
+  HeartIcon,
+  ShareIcon,
+  ChatBubbleOvalLeftIcon as CommentIcon,
+  EllipsisHorizontalIcon as MoreIcon,
+  XMarkIcon as CloseIcon,
+  CheckIcon,
+  TrashIcon,
+  PencilSquareIcon as EditIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EyeIcon,
+  FolderPlusIcon as AddToFolderIcon,
+  ArrowUpTrayIcon as UploadIcon,
+  LinkIcon,
+  FlagIcon,
+  UserPlusIcon as FollowIcon,
+  SparklesIcon,
+  FireIcon as TrendingIcon,
+  ClockIcon as RecentIcon,
+  TagIcon,
 } from '@heroicons/react/24/outline';
-// If you prefer solid icons, import from '@heroicons/react/24/solid' where needed.
+
+export {
+  HeartIcon as HeartIconSolid,
+  BookmarkIcon as BookmarkIconSolid,
+} from '@heroicons/react/24/solid';

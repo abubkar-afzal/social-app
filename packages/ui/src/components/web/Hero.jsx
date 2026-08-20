@@ -1,61 +1,218 @@
-import { PlayIcon, PauseIcon } from '../../icons';
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon, HeartIcon } from '../../icons';
+import { fetchMediaBatch } from '../../utils/mockData';
 
-const demoMedia = [
-  { id: 1, type: 'video', src: 'https://example.com/video1.mp4', title: 'Amazing Nature' },
-  { id: 2, type: 'photo', src: 'https://example.com/photo1.jpg', title: 'City Lights' },
-  { id: 3, type: 'audio', src: 'https://example.com/audio1.mp3', title: 'Chill Beats' },
-  { id: 4, type: 'photo', src: 'https://example.com/photo2.jpg', title: 'Mountain View' },
-  { id: 5, type: 'video', src: 'https://example.com/video2.mp4', title: 'Cooking Tutorial' },
-  { id: 6, type: 'photo', src: 'https://example.com/photo3.jpg', title: 'Abstract Art' },
-];
+// Skeleton Loader
+const HeroSkeleton = () => (
+  <div className="rounded-lg overflow-hidden bg-surface shadow-sm">
+    <div className="aspect-[3/4] bg-border animate-pulse" />
+    <div className="p-3">
+      <div className="h-4 bg-border rounded mb-2 animate-pulse" />
+      <div className="h-3 bg-border rounded w-2/3 animate-pulse" />
+    </div>
+  </div>
+);
+
+// Video Card with Autoplay on hover
+const VideoCard = ({ video }) => (
+  <Link href={`/media/${video.id}`}>
+    <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
+      <video
+        src={video.src}
+        className="w-full h-full object-cover"
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onMouseEnter={(e) => e.target.play()}
+        onMouseLeave={(e) => {
+          e.target.pause();
+          e.target.currentTime = 0;
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        <h3 className="text-white font-semibold truncate">{video.title}</h3>
+        <p className="text-white/80 text-xs">{video.views} views</p>
+      </div>
+    </div>
+  </Link>
+);
+
+// Photo Card
+const PhotoCard = ({ photo }) => (
+  <Link href={`/media/${photo.id}`}>
+    <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
+      <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" loading="lazy" />
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+        <div className="flex justify-end">
+          <button className="rounded-full bg-white/90 p-2 hover:bg-white">
+            <BookmarkIcon className="h-5 w-5" />
+          </button>
+        </div>
+        <div>
+          <h3 className="text-white font-semibold truncate">{photo.title}</h3>
+          <p className="text-white/80 text-xs">{photo.views} views</p>
+        </div>
+      </div>
+    </div>
+  </Link>
+);
+
+// Audio Card
+const AudioCard = ({ audio }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <Link href={`/media/${audio.id}`}>
+      <div className="group relative rounded-lg overflow-hidden bg-gradient-to-br from-primary-light to-primary-dark shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
+        <div className="aspect-square flex items-center justify-center">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              togglePlay();
+            }}
+            className="rounded-full bg-white/20 p-5 hover:bg-white/30 transition group-hover:scale-110"
+          >
+            {isPlaying ? (
+              <PauseIcon className="h-12 w-12 text-white" />
+            ) : (
+              <PlayIcon className="h-12 w-12 text-white" />
+            )}
+          </button>
+          <audio ref={audioRef} src={audio.src} className="hidden" onEnded={() => setIsPlaying(false)} />
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+          <h3 className="text-white font-semibold truncate">{audio.title}</h3>
+          <p className="text-white/80 text-xs">{audio.views} views</p>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 export default function Hero() {
+  const [heroItems, setHeroItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    loadHeroItems(0);
+  }, []);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadHeroItems(page);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [page, hasMore]);
+
+  const loadHeroItems = async (pageNum) => {
+    const items = await fetchMediaBatch(pageNum, 12);
+    if (pageNum === 0) {
+      setHeroItems(items);
+      setLoading(false);
+    } else {
+      if (items.length === 0) {
+        setHasMore(false);
+      } else {
+        setHeroItems(prev => [...prev, ...items]);
+      }
+    }
+    setPage(prev => prev + 1);
+  };
+
+  const filteredItems = activeFilter === 'all' 
+    ? heroItems 
+    : heroItems.filter(item => item.type === activeFilter);
+
   return (
-    <section className="bg-background py-8 md:py-12">
+    <section className="bg-background py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-5xl font-bold text-text mb-4">
+        {/* Hero Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">
             Discover, Share & Inspire
           </h1>
-          <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto">
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
             Explore a world of videos, photos, and audio curated by people like you.
           </p>
         </div>
 
-        {/* Masonry grid (simple responsive columns) */}
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-          {demoMedia.map((media) => (
-            <div
-              key={media.id}
-              className="break-inside-avoid rounded-lg overflow-hidden shadow-md bg-surface hover:shadow-lg transition-shadow duration-300"
+        {/* Filter Tabs
+        <div className="flex justify-center gap-2 mb-8">
+          {['all', 'video', 'photo', 'audio'].map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-6 py-2 rounded-full font-medium transition ${
+                activeFilter === filter
+                  ? 'bg-primary text-white'
+                  : 'bg-surface text-text hover:bg-background border border-border'
+              }`}
             >
-              {media.type === 'video' ? (
-                <div className="relative aspect-video bg-black">
-                  <video
-                    src={media.src}
-                    className="w-full h-full object-cover"
-                    controls
-                    poster=""
-                  />
-                </div>
-              ) : media.type === 'audio' ? (
-                <div className="aspect-square bg-gradient-to-br from-primary-light to-primary-dark flex items-center justify-center">
-                  <div className="text-white text-center p-4">
-                    <span className="block text-sm font-medium mb-2">🎵 Audio</span>
-                    <button className="rounded-full bg-white/20 p-3 hover:bg-white/30">
-                      <PlayIcon className="h-8 w-8" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <img src={media.src} alt={media.title} className="w-full object-cover" />
-              )}
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-text truncate">{media.title}</h3>
-              </div>
-            </div>
+              {filter.charAt(0).toUpperCase() + filter.slice(1)}
+            </button>
           ))}
-        </div>
+        </div> */}
+
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(8)].map((_, i) => <HeroSkeleton key={i} />)}
+          </div>
+        ) : (
+          <>
+            {/* Pinterest Masonry Layout */}
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+              {filteredItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`break-inside-avoid ${
+                    index % 4 === 0 ? 'aspect-[3/4]' : 
+                    index % 4 === 1 ? 'aspect-square' : 
+                    index % 4 === 2 ? 'aspect-[4/5]' : 
+                    'aspect-[3/4]'
+                  }`}
+                >
+                  {item.type === 'video' && <VideoCard video={item} />}
+                  {item.type === 'photo' && <PhotoCard photo={item} />}
+                  {item.type === 'audio' && <AudioCard audio={item} />}
+                </div>
+              ))}
+            </div>
+
+            <div ref={sentinelRef} className="h-10" />
+            
+            {hasMore && (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );

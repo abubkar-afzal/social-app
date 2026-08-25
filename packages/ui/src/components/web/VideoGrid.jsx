@@ -16,9 +16,7 @@ export default function VideoGrid() {
     if (!sentinelRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          loadVideos(page);
-        }
+        if (entries[0].isIntersecting) loadVideos(page);
       },
       { threshold: 0.1 }
     );
@@ -49,8 +47,9 @@ export default function VideoGrid() {
                 className="w-full aspect-video object-cover"
                 muted
                 loop
-                onMouseEnter={(e) => e.target.play()}
-                onMouseLeave={(e) => e.target.pause()}
+                autoPlay
+                playsInline
+                preload="auto"
               />
               <div className="p-4">
                 <h3 className="font-semibold truncate">{video.title}</h3>

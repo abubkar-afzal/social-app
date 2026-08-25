@@ -1,37 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
-import { VideoView, useVideoPlayer } from 'expo-video';
+import { Video } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
 
 const { width } = Dimensions.get('window');
 
-const VideoCard = ({ video, onPress }) => {
-  const player = useVideoPlayer(video.src, (player) => {
-    player.loop = true;
-    player.muted = true;
-  });
-
-  return (
-    <TouchableOpacity
-      className="bg-surface rounded-xl overflow-hidden mb-3 shadow-md"
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <VideoView
-        player={player}
-        style={{ width: '100%', aspectRatio: 16/9 }}
-        contentFit="cover"
-      />
-      <View className="p-3">
-        <Text className="text-base font-semibold text-text mb-1" numberOfLines={1}>
-          {video.title}
-        </Text>
-        <Text className="text-xs text-text-secondary">{video.views} views</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
+const VideoCard = ({ video, onPress }) => (
+  <TouchableOpacity
+    className="bg-surface rounded-xl overflow-hidden mb-3 shadow-md"
+    onPress={onPress}
+    activeOpacity={0.8}
+  >
+    <Video
+      source={{ uri: video.src }}
+      style={{ width: '100%', aspectRatio: 16 / 9 }}
+      resizeMode="cover"
+      shouldPlay
+      isMuted
+      isLooping
+    />
+    <View className="p-3">
+      <Text className="text-base font-semibold text-text mb-1" numberOfLines={1}>{video.title}</Text>
+      <Text className="text-xs text-text-secondary">{video.views} views</Text>
+    </View>
+  </TouchableOpacity>
+);
 
 export default function MobileVideoGrid() {
   const [videos, setVideos] = useState([]);

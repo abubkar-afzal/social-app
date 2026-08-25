@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchMediaById, fetchSuggestions } from '../../utils/mockData';
-import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon, HeartIcon, ShareIcon, CommentIcon } from '../../icons';
+import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon, HeartIcon, ShareIcon, CommentIcon, MoreIcon } from '../../icons';
 
-// Enhanced Video Player
+// Video Player
 const VideoPlayer = ({ src }) => {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef(null);
-
   return (
     <div className="relative">
       <video
@@ -29,7 +28,7 @@ const VideoPlayer = ({ src }) => {
   );
 };
 
-// Enhanced Audio Player
+// Audio Player
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -39,11 +38,8 @@ const AudioPlayer = ({ src }) => {
 
   const togglePlay = () => {
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
+      if (isPlaying) audioRef.current.pause();
+      else audioRef.current.play();
       setIsPlaying(!isPlaying);
     }
   };
@@ -68,14 +64,9 @@ const AudioPlayer = ({ src }) => {
     <div className="w-full aspect-video bg-gradient-to-br from-primary-light via-primary to-primary-dark flex flex-col items-center justify-center p-8">
       <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-6">
         <button onClick={togglePlay} className="p-4">
-          {isPlaying ? (
-            <PauseIcon className="h-12 w-12 text-white" />
-          ) : (
-            <PlayIcon className="h-12 w-12 text-white" />
-          )}
+          {isPlaying ? <PauseIcon className="h-12 w-12 text-white" /> : <PlayIcon className="h-12 w-12 text-white" />}
         </button>
       </div>
-      
       <div className="w-full max-w-md">
         <div className="flex justify-between text-white text-sm mb-2">
           <span>{formatTime(currentTime)}</span>
@@ -85,7 +76,6 @@ const AudioPlayer = ({ src }) => {
           <div className="bg-white h-2 rounded-full" style={{ width: `${progress}%` }} />
         </div>
       </div>
-      
       <audio
         ref={audioRef}
         src={src}
@@ -145,6 +135,8 @@ export default function DesktopMediaDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     loadMedia();
@@ -157,6 +149,17 @@ export default function DesktopMediaDetail() {
     const sugg = await fetchSuggestions(item.type, id);
     setSuggestions(sugg);
     setLoading(false);
+  };
+
+  const addComment = (e) => {
+    e.preventDefault();
+    if (comment.trim()) {
+      setComments([
+        ...comments,
+        { id: comments.length + 1, user: 'Demo User', avatar: 'https://i.pravatar.cc/150?img=5', text: comment, time: 'Just now' },
+      ]);
+      setComment('');
+    }
   };
 
   if (loading || !media) {
@@ -174,9 +177,7 @@ export default function DesktopMediaDetail() {
         <div className="lg:col-span-2">
           <div className="rounded-xl overflow-hidden bg-surface shadow-lg">
             {media.type === 'video' && <VideoPlayer src={media.src} />}
-            {media.type === 'photo' && (
-              <img src={media.src} alt={media.title} className="w-full object-cover" />
-            )}
+            {media.type === 'photo' && <img src={media.src} alt={media.title} className="w-full object-cover" />}
             {media.type === 'audio' && <AudioPlayer src={media.src} />}
           </div>
 
@@ -187,12 +188,11 @@ export default function DesktopMediaDetail() {
                 <p className="text-text-secondary mt-1">{media.description}</p>
                 <div className="flex gap-2 mt-3">
                   {media.tags?.map((tag) => (
-                    <span key={tag} className="text-xs bg-background px-3 py-1 rounded-full text-text-secondary">
-                      #{tag}
-                    </span>
+                    <span key={tag} className="text-xs bg-background px-3 py-1 rounded-full text-text-secondary">#{tag}</span>
                   ))}
                 </div>
               </div>
+              <button className="p-2 rounded-full hover:bg-background"><MoreIcon className="h-6 w-6 text-text-secondary" /></button>
             </div>
 
             <div className="flex gap-6 mt-4 text-sm">
@@ -225,13 +225,40 @@ export default function DesktopMediaDetail() {
               <button
                 onClick={() => setIsFollowing(!isFollowing)}
                 className={`px-6 py-2 rounded-full font-medium transition ${
-                  isFollowing 
-                    ? 'bg-background text-text border border-border' 
+                  isFollowing
+                    ? 'bg-background text-text border border-border'
                     : 'bg-primary text-white hover:bg-primary-dark'
                 }`}
               >
                 {isFollowing ? 'Following' : 'Follow'}
               </button>
+            </div>
+
+            <div className="mt-6">
+              <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
+              <form onSubmit={addComment} className="flex gap-3 mb-6">
+                <img src="https://i.pravatar.cc/150?img=5" alt="You" className="w-10 h-10 rounded-full" />
+                <input
+                  type="text"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 bg-surface rounded-full px-4 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button type="submit" className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark">Post</button>
+              </form>
+              <div className="space-y-4">
+                {comments.map((c) => (
+                  <div key={c.id} className="flex gap-3">
+                    <img src={c.avatar} alt={c.user} className="w-10 h-10 rounded-full" />
+                    <div>
+                      <p className="font-semibold text-sm">{c.user}</p>
+                      <p className="text-text-secondary">{c.text}</p>
+                      <p className="text-xs text-text-secondary mt-1">{c.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -240,9 +267,7 @@ export default function DesktopMediaDetail() {
         <div className="lg:col-span-1">
           <h2 className="text-xl font-bold text-text mb-4">More like this</h2>
           <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
-            {suggestions.map((item) => (
-              <SuggestionCard key={item.id} item={item} />
-            ))}
+            {suggestions.map((item) => <SuggestionCard key={item.id} item={item} />)}
           </div>
         </div>
       </div>

@@ -47,8 +47,13 @@ export default function DesktopVideoGrid() {
                 className="w-full aspect-video object-cover"
                 muted
                 loop
+                playsInline
+                preload="metadata"
                 onMouseEnter={(e) => e.target.play()}
-                onMouseLeave={(e) => e.target.pause()}
+                onMouseLeave={(e) => {
+                  e.target.pause();
+                  e.target.currentTime = 0;
+                }}
               />
               <div className="p-4">
                 <h3 className="font-semibold truncate">{video.title}</h3>

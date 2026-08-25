@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Audio } from 'expo-audio';
+import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
 
@@ -9,6 +9,7 @@ export default function MobileAudioGrid() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [playingId, setPlayingId] = useState(null);
+  const soundRef = useRef(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -24,6 +25,23 @@ export default function MobileAudioGrid() {
       setAudios(prev => [...prev, ...items]);
     }
     setPage(prev => prev + 1);
+  };
+
+  const togglePlay = async (audio) => {
+    if (playingId === audio.id) {
+      if (soundRef.current) {
+        await soundRef.current.pauseAsync();
+      }
+      setPlayingId(null);
+    } else {
+      if (soundRef.current) {
+        await soundRef.current.unloadAsync();
+      }
+      const { sound } = await Audio.Sound.createAsync({ uri: audio.src });
+      soundRef.current = sound;
+      await sound.playAsync();
+      setPlayingId(audio.id);
+    }
   };
 
   if (loading) {
@@ -44,9 +62,9 @@ export default function MobileAudioGrid() {
           activeOpacity={0.8}
         >
           <View className="p-4 flex-row items-center gap-3">
-            <View className="w-16 h-16 rounded-full bg-primary items-center justify-center">
+            <TouchableOpacity onPress={() => togglePlay(item)} className="w-16 h-16 rounded-full bg-primary items-center justify-center">
               <Text className="text-2xl text-white">{playingId === item.id ? '⏸️' : '▶️'}</Text>
-            </View>
+            </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-base font-semibold text-text" numberOfLines={1}>{item.title}</Text>
               <Text className="text-xs text-text-secondary">{item.views} views</Text>

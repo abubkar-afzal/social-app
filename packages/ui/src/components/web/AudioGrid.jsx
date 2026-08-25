@@ -8,6 +8,7 @@ export default function AudioGrid() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [playingId, setPlayingId] = useState(null);
+  const audioRefs = useRef({});
   const sentinelRef = useRef(null);
 
   useEffect(() => {
@@ -18,9 +19,7 @@ export default function AudioGrid() {
     if (!sentinelRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          loadAudios(page);
-        }
+        if (entries[0].isIntersecting) loadAudios(page);
       },
       { threshold: 0.1 }
     );
@@ -39,8 +38,27 @@ export default function AudioGrid() {
     setPage(prev => prev + 1);
   };
 
-  const togglePlay = (id) => {
-    setPlayingId(playingId === id ? null : id);
+  const togglePlay = (e, audioId) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (playingId === audioId) {
+      const current = audioRefs.current[audioId];
+      if (current) {
+        current.pause();
+      }
+      setPlayingId(null);
+    } else {
+      // pause previous
+      if (playingId) {
+        const prev = audioRefs.current[playingId];
+        if (prev) {
+          prev.pause();
+        }
+      }
+      setPlayingId(audioId);
+      // audio element will autoPlay due to conditional rendering
+    }
   };
 
   return (
@@ -48,25 +66,35 @@ export default function AudioGrid() {
       <h1 className="text-3xl font-bold mb-6">Audio</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {audios.map((audio) => (
-          <div key={audio.id} className="rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-lg transition-shadow">
-            <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-              <button
-                onClick={() => togglePlay(audio.id)}
-                className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
-              >
-                {playingId === audio.id ? (
-                  <PauseIcon className="h-12 w-12 text-white" />
-                ) : (
-                  <PlayIcon className="h-12 w-12 text-white" />
+          <Link href={`/media/${audio.id}`} key={audio.id}>
+            <div className="rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
+                <button
+                  onClick={(e) => togglePlay(e, audio.id)}
+                  className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
+                >
+                  {playingId === audio.id ? (
+                    <PauseIcon className="h-12 w-12 text-white" />
+                  ) : (
+                    <PlayIcon className="h-12 w-12 text-white" />
+                  )}
+                </button>
+                {playingId === audio.id && (
+                  <audio
+                    ref={(el) => (audioRefs.current[audio.id] = el)}
+                    src={audio.src}
+                    autoPlay
+                    className="hidden"
+                    onEnded={() => setPlayingId(null)}
+                  />
                 )}
-              </button>
-              {playingId === audio.id && <audio src={audio.src} autoPlay className="hidden" />}
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold truncate">{audio.title}</h3>
+                <p className="text-sm text-text-secondary">{audio.views} views</p>
+              </div>
             </div>
-            <div className="p-4">
-              <h3 className="font-semibold truncate">{audio.title}</h3>
-              <p className="text-sm text-text-secondary">{audio.views} views</p>
-            </div>
-          </div>
+          </Link>
         ))}
       </div>
       <div ref={sentinelRef} className="h-10" />

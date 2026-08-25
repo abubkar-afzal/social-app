@@ -17,10 +17,9 @@ const SkeletonCard = () => (
   </div>
 );
 
-// Video Player
+// Video Player Component (muted, autoplay on hover)
 const VideoPlayer = ({ src }) => {
   const videoRef = useRef(null);
-
   return (
     <video
       ref={videoRef}
@@ -39,18 +38,17 @@ const VideoPlayer = ({ src }) => {
   );
 };
 
-// Audio Player
+// Audio Player Component
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
-  const togglePlay = () => {
+  const togglePlay = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
+      if (isPlaying) audioRef.current.pause();
+      else audioRef.current.play();
       setIsPlaying(!isPlaying);
     }
   };
@@ -61,13 +59,23 @@ const AudioPlayer = ({ src }) => {
         onClick={togglePlay}
         className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
       >
-        {isPlaying ? <PauseIcon className="h-12 w-12 text-white" /> : <PlayIcon className="h-12 w-12 text-white" />}
+        {isPlaying ? (
+          <PauseIcon className="h-12 w-12 text-white" />
+        ) : (
+          <PlayIcon className="h-12 w-12 text-white" />
+        )}
       </button>
       <audio ref={audioRef} src={src} className="hidden" onEnded={() => setIsPlaying(false)} />
     </div>
   );
 };
 
+// Image Display Component
+const ImageDisplay = ({ src, alt }) => (
+  <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" />
+);
+
+// Individual Media Card
 export const DesktopMediaCardItem = ({ media }) => {
   const [isSaved, setIsSaved] = useState(false);
 
@@ -80,10 +88,11 @@ export const DesktopMediaCardItem = ({ media }) => {
           ) : media.type === 'audio' ? (
             <AudioPlayer src={media.src} />
           ) : (
-            <img src={media.src} alt={media.title} className="w-full h-full object-cover" loading="lazy" />
+            <ImageDisplay src={media.src} alt={media.title} />
           )}
         </div>
-        
+
+        {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
           <div className="flex justify-end">
             <button
@@ -91,7 +100,7 @@ export const DesktopMediaCardItem = ({ media }) => {
                 e.preventDefault();
                 setIsSaved(!isSaved);
               }}
-              className={`rounded-full p-2 ${isSaved ? 'bg-primary text-white' : 'bg-white/90 text-text'}`}
+              className={`rounded-full p-2 ${isSaved ? 'bg-primary text-white' : 'bg-white/90 text-text hover:bg-white'}`}
             >
               <BookmarkIcon className="h-5 w-5" />
             </button>
@@ -99,9 +108,12 @@ export const DesktopMediaCardItem = ({ media }) => {
           <div className="flex justify-between items-center">
             <div>
               <span className="text-white text-sm font-medium truncate block">{media.title}</span>
-              <span className="text-white/70 text-xs">{media.views} views</span>
+              <span className="text-white/70 text-xs">{media.views} views • {media.likes} likes</span>
             </div>
-            <button className="rounded-full bg-primary p-2 text-white">
+            <button
+              onClick={(e) => e.preventDefault()}
+              className="rounded-full bg-primary p-2 text-white hover:bg-primary-dark"
+            >
               <PlusIcon className="h-5 w-5" />
             </button>
           </div>
@@ -111,6 +123,7 @@ export const DesktopMediaCardItem = ({ media }) => {
   );
 };
 
+// Grid Component with Infinite Scroll
 export default function DesktopMediaCardGrid() {
   const [mediaItems, setMediaItems] = useState([]);
   const [loading, setLoading] = useState(true);

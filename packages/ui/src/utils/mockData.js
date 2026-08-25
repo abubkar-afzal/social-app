@@ -5,12 +5,10 @@ export const generateMediaItem = (index, type = null) => {
   const itemType = type || types[index % 3];
   
   const videos = [
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    'https://www.w3schools.com/html/mov_bbb.mp4',
+    'https://www.w3schools.com/html/movie.mp4',
+    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
   ];
 
   const photos = [
@@ -20,22 +18,17 @@ export const generateMediaItem = (index, type = null) => {
     'https://picsum.photos/800/600?random=4',
     'https://picsum.photos/800/600?random=5',
     'https://picsum.photos/800/600?random=6',
-    'https://picsum.photos/800/600?random=7',
-    'https://picsum.photos/800/600?random=8',
   ];
 
   const audios = [
     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
   ];
 
   const titles = [
     'Amazing Nature', 'City Lights', 'Chill Beats', 'Mountain View',
     'Cooking Tutorial', 'Abstract Art', 'Ocean Waves', 'Forest Walk',
-    'Urban Life', 'Sunset Vibes', 'Rainy Day', 'Starry Night',
-    'Morning Dew', 'Golden Hour', 'Wild Adventure', 'Peaceful Moments'
+    'Urban Life', 'Sunset Vibes', 'Rainy Day', 'Starry Night'
   ];
 
   const users = [
@@ -92,7 +85,7 @@ export const fetchSuggestions = (type, excludeId) => {
       const items = [];
       for (let i = 0; i < 8; i++) {
         const item = generateMediaItem(i, type);
-        item.id = `suggestion-${i}`;
+        item.id = (++idCounter).toString(); // ensure unique
         items.push(item);
       }
       resolve(items);

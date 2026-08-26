@@ -1,39 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator, FlatList, TextInput, Platform } from 'react-native';
-import { Video, Audio } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useAudioPlayer } from 'expo-audio';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { fetchMediaById, fetchSuggestions } from '../../utils/mockData';
 
-const VideoPlayer = ({ src }) => (
-  <Video
-    source={{ uri: src }}
-    style={{ width: '100%', aspectRatio: 16 / 9 }}
-    resizeMode="contain"
-    shouldPlay
-    useNativeControls
-    isMuted={false}
-  />
-);
+const VideoPlayer = ({ src }) => {
+  const player = useVideoPlayer(src, (player) => {
+    player.loop = true;
+    player.muted = false;
+    player.play();
+  });
+  return <VideoView player={player} style={{ width: '100%', aspectRatio: 16/9 }} contentFit="contain" nativeControls />;
+};
 
 const AudioPlayer = ({ src, title }) => {
-  const [sound, setSound] = useState(null);
+  const player = useAudioPlayer({ uri: src });
   const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = async () => {
-    if (isPlaying && sound) {
-      await sound.pauseAsync();
-      setIsPlaying(false);
-    } else if (sound) {
-      await sound.playAsync();
-      setIsPlaying(true);
-    } else {
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri: src });
-      setSound(newSound);
-      await newSound.playAsync();
-      setIsPlaying(true);
-    }
+  const togglePlay = () => {
+    if (isPlaying) player.pause(); else player.play();
+    setIsPlaying(!isPlaying);
   };
-
   return (
     <View className="aspect-square bg-gradient-to-br from-primary-light to-primary-dark items-center justify-center">
       <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-6">

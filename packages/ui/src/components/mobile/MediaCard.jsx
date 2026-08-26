@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, Dimensions } from 'react-native';
-import { Video, Audio } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useAudioPlayer } from 'expo-audio';
 import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
 
@@ -20,25 +21,26 @@ const SkeletonCard = () => (
   </View>
 );
 
-const VideoPlayer = ({ src }) => (
-  <Video source={{ uri: src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" shouldPlay isMuted isLooping />
-);
+const VideoPlayer = ({ src }) => {
+  const player = useVideoPlayer(src, (player) => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
+
+  return <VideoView player={player} style={{ width: '100%', height: '100%' }} contentFit="cover" />;
+};
 
 const AudioPlayer = ({ src, color }) => {
-  const [sound, setSound] = useState(null);
+  const player = useAudioPlayer({ uri: src });
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const togglePlay = async () => {
-    if (isPlaying && sound) {
-      await sound.pauseAsync();
+  const togglePlay = () => {
+    if (isPlaying) {
+      player.pause();
       setIsPlaying(false);
-    } else if (sound) {
-      await sound.playAsync();
-      setIsPlaying(true);
     } else {
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri: src });
-      setSound(newSound);
-      await newSound.playAsync();
+      player.play();
       setIsPlaying(true);
     }
   };
@@ -64,7 +66,9 @@ export const MobileMediaCardItem = ({ media }) => {
       activeOpacity={0.85}
     >
       <View className="aspect-square">
-        {media.type === 'video' ? <VideoPlayer src={media.src} /> : media.type === 'audio' ? <AudioPlayer src={media.src} color={media.color} /> : <Image source={{ uri: media.src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
+        {media.type === 'video' ? <VideoPlayer src={media.src} /> :
+         media.type === 'audio' ? <AudioPlayer src={media.src} color={media.color} /> :
+         <Image source={{ uri: media.src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
       </View>
       <View className="p-3">
         <Text className="text-base font-semibold text-text mb-2" numberOfLines={1}>{media.title}</Text>
@@ -79,6 +83,7 @@ export const MobileMediaCardItem = ({ media }) => {
     </TouchableOpacity>
   );
 };
+
 
 export default function MobileMediaCard({ initialItems = [] }) {
   const [mediaItems, setMediaItems] = useState(initialItems);

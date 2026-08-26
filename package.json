@@ -6,7 +6,6 @@
     "apps/*",
     "packages/*",
     "desktop"
-
   ],
   "scripts": {
     "mobile": "npm run start --workspace=mobile",

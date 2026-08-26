@@ -1,20 +1,43 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
+
+const AudioCard = ({ audio, onPress, isPlaying, onToggle }) => {
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} className="bg-surface rounded-xl overflow-hidden mb-3 shadow-md">
+      <View className="p-4 flex-row items-center gap-3">
+        <TouchableOpacity onPress={onToggle} className="w-16 h-16 rounded-full bg-primary items-center justify-center">
+          <Text className="text-2xl text-white">{isPlaying ? '⏸️' : '▶️'}</Text>
+        </TouchableOpacity>
+        <View className="flex-1">
+          <Text className="text-base font-semibold text-text" numberOfLines={1}>{audio.title}</Text>
+          <Text className="text-xs text-text-secondary">{audio.views} views</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 export default function MobileAudioGrid() {
   const [audios, setAudios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [playingId, setPlayingId] = useState(null);
-  const soundRef = useRef(null);
   const navigation = useNavigation();
+  // Use a single audio player for the entire grid (or manage multiple; here we use one)
+  const player = useAudioPlayer(null);
 
   useEffect(() => {
     loadAudios(0);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (player) player.pause();
+    };
+  }, [player]);
 
   const loadAudios = async (pageNum) => {
     const items = await fetchMediaBatch(pageNum, 6, 'audio');
@@ -29,17 +52,12 @@ export default function MobileAudioGrid() {
 
   const togglePlay = async (audio) => {
     if (playingId === audio.id) {
-      if (soundRef.current) {
-        await soundRef.current.pauseAsync();
-      }
+      player.pause();
       setPlayingId(null);
     } else {
-      if (soundRef.current) {
-        await soundRef.current.unloadAsync();
-      }
-      const { sound } = await Audio.Sound.createAsync({ uri: audio.src });
-      soundRef.current = sound;
-      await sound.playAsync();
+      // Replace the source and play
+      player.replace({ uri: audio.src });
+      player.play();
       setPlayingId(audio.id);
     }
   };
@@ -56,21 +74,12 @@ export default function MobileAudioGrid() {
     <FlatList
       data={audios}
       renderItem={({ item }) => (
-        <TouchableOpacity
-          className="bg-surface rounded-xl overflow-hidden mb-3 shadow-md"
+        <AudioCard
+          audio={item}
           onPress={() => navigation.navigate('MediaDetail', { mediaId: item.id, type: 'audio' })}
-          activeOpacity={0.8}
-        >
-          <View className="p-4 flex-row items-center gap-3">
-            <TouchableOpacity onPress={() => togglePlay(item)} className="w-16 h-16 rounded-full bg-primary items-center justify-center">
-              <Text className="text-2xl text-white">{playingId === item.id ? '⏸️' : '▶️'}</Text>
-            </TouchableOpacity>
-            <View className="flex-1">
-              <Text className="text-base font-semibold text-text" numberOfLines={1}>{item.title}</Text>
-              <Text className="text-xs text-text-secondary">{item.views} views</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+          isPlaying={playingId === item.id}
+          onToggle={() => togglePlay(item)}
+        />
       )}
       keyExtractor={(item) => item.id}
       contentContainerStyle={{ padding: 12 }}

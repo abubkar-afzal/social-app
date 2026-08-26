@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
-import { Video, Audio } from 'expo-av';
-import { useNavigation } from '@react-navigation/native';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useAudioPlayer } from 'expo-audio';import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
 
 const { width } = Dimensions.get('window');
@@ -17,16 +17,6 @@ const HeroSkeleton = () => (
   </View>
 );
 
-const VideoCard = ({ video, onPress }) => (
-  <TouchableOpacity className="bg-surface rounded-xl overflow-hidden shadow-md mb-3" style={{ width: CARD_WIDTH }} onPress={onPress} activeOpacity={0.85}>
-    <Video source={{ uri: video.src }} style={{ width: '100%', aspectRatio: 1 }} resizeMode="cover" shouldPlay isMuted isLooping />
-    <View className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
-      <Text className="text-white text-sm font-medium" numberOfLines={1}>{video.title}</Text>
-      <Text className="text-white/70 text-xs">{video.views} views</Text>
-    </View>
-  </TouchableOpacity>
-);
-
 const PhotoCard = ({ photo, onPress }) => (
   <TouchableOpacity className="bg-surface rounded-xl overflow-hidden shadow-md mb-3" style={{ width: CARD_WIDTH }} onPress={onPress} activeOpacity={0.85}>
     <Image source={{ uri: photo.src }} style={{ width: '100%', aspectRatio: 1 }} />
@@ -37,27 +27,34 @@ const PhotoCard = ({ photo, onPress }) => (
   </TouchableOpacity>
 );
 
-const AudioCard = ({ audio, onPress }) => {
-  const [sound, setSound] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = async () => {
-    if (isPlaying && sound) {
-      await sound.pauseAsync();
-      setIsPlaying(false);
-    } else if (sound) {
-      await sound.playAsync();
-      setIsPlaying(true);
-    } else {
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri: audio.src });
-      setSound(newSound);
-      await newSound.playAsync();
-      setIsPlaying(true);
-    }
-  };
-
+// In VideoCard:
+const VideoCard = ({ video, onPress }) => {
+  const player = useVideoPlayer(video.src, (player) => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
   return (
-    <TouchableOpacity className="bg-surface rounded-xl overflow-hidden shadow-md mb-3" style={{ width: CARD_WIDTH }} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity style={{ width: CARD_WIDTH }} onPress={onPress} className="bg-surface rounded-xl overflow-hidden shadow-md mb-3">
+      <VideoView player={player} style={{ width: '100%', aspectRatio: 1 }} contentFit="cover" />
+      <View className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
+        <Text className="text-white text-sm font-medium" numberOfLines={1}>{video.title}</Text>
+        <Text className="text-white/70 text-xs">{video.views} views</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+// In AudioCard:
+const AudioCard = ({ audio, onPress }) => {
+  const player = useAudioPlayer({ uri: audio.src });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const togglePlay = () => {
+    if (isPlaying) player.pause(); else player.play();
+    setIsPlaying(!isPlaying);
+  };
+  return (
+    <TouchableOpacity style={{ width: CARD_WIDTH }} onPress={onPress} className="bg-surface rounded-xl overflow-hidden shadow-md mb-3">
       <View className="aspect-square items-center justify-center" style={{ backgroundColor: audio.color }}>
         <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-4 mb-2">
           <Text className="text-4xl">{isPlaying ? '⏸️' : '▶️'}</Text>

@@ -4,43 +4,48 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="bg-surface border-t border-border mt-auto">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">Explore</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li><Link href="/videos" className="hover:text-primary">Videos</Link></li>
-              <li><Link href="/photos" className="hover:text-primary">Photos</Link></li>
-              <li><Link href="/audio" className="hover:text-primary">Audio</Link></li>
+              <li><Link href="/videos" className="hover:text-primary transition">Videos</Link></li>
+              <li><Link href="/photos" className="hover:text-primary transition">Photos</Link></li>
+              <li><Link href="/audio" className="hover:text-primary transition">Audio</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">About</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li><a href="#" className="hover:text-primary">Our Story</a></li>
-              <li><a href="#" className="hover:text-primary">Careers</a></li>
-              <li><a href="#" className="hover:text-primary">Press</a></li>
+              <li><Link href="/about" className="hover:text-primary transition">Our Story</Link></li>
+              <li><Link href="/careers" className="hover:text-primary transition">Careers</Link></li>
+              <li><Link href="/press" className="hover:text-primary transition">Press</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">Resources</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li><a href="#" className="hover:text-primary">Blog</a></li>
-              <li><a href="#" className="hover:text-primary">Help Center</a></li>
-              <li><a href="#" className="hover:text-primary">Guidelines</a></li>
+              <li><Link href="/blog" className="hover:text-primary transition">Blog</Link></li>
+              <li><Link href="/help" className="hover:text-primary transition">Help Center</Link></li>
+              <li><Link href="/guidelines" className="hover:text-primary transition">Guidelines</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">Account</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li><Link href="/login" className="hover:text-primary">Login</Link></li>
-              <li><Link href="/account" className="hover:text-primary">Profile</Link></li>
-              <li><a href="#" className="hover:text-primary">Settings</a></li>
+              <li><Link href="/login" className="hover:text-primary transition">Login</Link></li>
+              <li><Link href="/account" className="hover:text-primary transition">Profile</Link></li>
+              <li><Link href="/settings" className="hover:text-primary transition">Settings</Link></li>
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-border text-center text-sm text-text-secondary">
-          © {new Date().getFullYear()} PinShare. All rights reserved.
+        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-text-secondary">© {new Date().getFullYear()} PinShare. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#" className="text-text-secondary hover:text-primary transition">Twitter</a>
+            <a href="#" className="text-text-secondary hover:text-primary transition">Instagram</a>
+            <a href="#" className="text-text-secondary hover:text-primary transition">YouTube</a>
+          </div>
         </div>
       </div>
     </footer>

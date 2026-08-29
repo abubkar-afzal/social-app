@@ -9,6 +9,12 @@ import DesktopMediaDetail from '../../packages/ui/src/components/desktop/MediaDe
 import DesktopLogin from '../../packages/ui/src/components/desktop/LoginPage';
 import DesktopAccount from '../../packages/ui/src/components/desktop/AccountPage';
 import DesktopFooter from '../../packages/ui/src/components/desktop/Footer';
+import AboutPage from '../../packages/ui/src/components/desktop/AboutPage';
+import CareersPage from '../../packages/ui/src/components/desktop/CareersPage';
+import PressPage from '../../packages/ui/src/components/desktop/PressPage';
+import BlogPage from '../../packages/ui/src/components/desktop/BlogPage';
+import HelpPage from '../../packages/ui/src/components/desktop/HelpPage';
+import GuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
 
 export default function App() {
   return (
@@ -24,6 +30,12 @@ export default function App() {
             <Route path="/media/:id" element={<DesktopMediaDetail />} />
             <Route path="/login" element={<DesktopLogin />} />
             <Route path="/account" element={<DesktopAccount />} />
+            <Route path="/about" element={<AboutPage />} />
+<Route path="/careers" element={<CareersPage />} />
+<Route path="/press" element={<PressPage />} />
+<Route path="/blog" element={<BlogPage />} />
+<Route path="/help" element={<HelpPage />} />
+<Route path="/guidelines" element={<GuidelinesPage />} />
           </Routes>
         </main>
         <DesktopFooter />

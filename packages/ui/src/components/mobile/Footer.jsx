@@ -1,75 +1,60 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, Platform } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Modal,
+  ScrollView,
+  Platform,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function MobileFooter({ state, descriptors, navigation }) {
-  const tabIcons = {
-    Home: '🏠',
-    Videos: '🎬',
-    Photos: '🖼️',
-    Audio: '🎵',
-    Account: '👤',
+  const nav = useNavigation();
+  const route = useRoute();
+
+ 
+
+  const tabs = [
+    { key: 'Home', label: 'Home', icon: '🏠', screen: 'Home' },
+    { key: 'Videos', label: 'Videos', icon: '🎬', screen: 'Videos' },
+    { key: 'Photos', label: 'Photos', icon: '🖼️', screen: 'Photos' },
+    { key: 'Audio', label: 'Audio', icon: '🎵', screen: 'Audio' },
+    { key: 'Login', label: 'Login', icon: '👤', screen: 'Login' },
+  ];
+
+  const handleTabPress = (screen) => {
+    // If we are inside a tab navigator (route.name is one of the tabs), navigate directly.
+    const tabNames = tabs.map(t => t.screen);
+    if (tabNames.includes(route.name)) {
+      nav.navigate(screen);
+    } else {
+      // Otherwise, navigate to the 'Main' stack screen and then to the tab.
+      nav.navigate('Main', { screen });
+    }
   };
 
-  if (!state) {
-    return (
-      <View className="flex-row bg-surface border-t border-border py-2" style={{ paddingBottom: Platform.OS === 'android' ? 16 : 0 }}>
-        <TouchableOpacity className="flex-1 items-center" onPress={() => navigation?.navigate('Home')}>
-          <Text className="text-2xl">🏠</Text>
-          <Text className="text-xs text-text-secondary">Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center" onPress={() => navigation?.navigate('Videos')}>
-          <Text className="text-2xl">🎬</Text>
-          <Text className="text-xs text-text-secondary">Videos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center" onPress={() => navigation?.navigate('Photos')}>
-          <Text className="text-2xl">🖼️</Text>
-          <Text className="text-xs text-text-secondary">Photos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center" onPress={() => navigation?.navigate('Audio')}>
-          <Text className="text-2xl">🎵</Text>
-          <Text className="text-xs text-text-secondary">Audio</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center" onPress={() => navigation?.navigate('Account')}>
-          <Text className="text-2xl">👤</Text>
-          <Text className="text-xs text-text-secondary">Profile</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   return (
-    <View className="flex-row bg-surface border-t border-border py-2" style={{ paddingBottom: Platform.OS === 'android' ? 16 : 0 }}>
-      {state.routes.map((route, index) => {
-        const isFocused = state.index === index;
-        const icon = tabIcons[route.name] || '📄';
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
+    <View>
+      <View
+        className="flex-row bg-surface border-t border-border py-2"
+        style={{ paddingBottom: Platform.OS === 'android' ? 16 : 0 }}
+      >
+        {tabs.map((tab) => (
           <TouchableOpacity
-            key={route.key}
-            onPress={onPress}
+            key={tab.key}
             className="flex-1 items-center"
+            onPress={() => handleTabPress(tab.screen)}
           >
-            <Text className={`text-2xl ${isFocused ? 'opacity-100' : 'opacity-50'}`}>
-              {icon}
-            </Text>
-            <Text className={`text-xs ${isFocused ? 'text-primary font-semibold' : 'text-text-secondary'}`}>
-              {route.name}
-            </Text>
+            <Text className="text-2xl">{tab.icon}</Text>
+            <Text className="text-xs text-text-secondary">{tab.label}</Text>
           </TouchableOpacity>
-        );
-      })}
+        ))}
+
+        
+      </View>
+
+      
     </View>
   );
 }

@@ -57,56 +57,46 @@ export const generateMediaItem = (index, type = null) => {
   };
 };
 
-export const fetchMediaBatch = (page, pageSize = 10, type = null) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const items = [];
-      const startIndex = page * pageSize;
-      for (let i = 0; i < pageSize; i++) {
-        items.push(generateMediaItem(startIndex + i, type));
-      }
-      resolve(items);
-    }, 1500);
-  });
+export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
+  const params = new URLSearchParams({ page, limit: pageSize });
+  if (type) params.append('type', type.toUpperCase());
+  const res = await fetch(`/api/media?${params}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch media');
+  }
+  const data = await res.json();
+  return data.media.map((item) => ({
+    ...item,
+    type: item.type.toLowerCase(),          // convert 'VIDEO' -> 'video'
+    src: item.googleDriveUrl,               // direct download link
+    thumbnail: item.thumbnailUrl,           // preserve thumbnail
+    likes: item.likesCount,
+    views: item.viewsCount,
+  }));
 };
 
-export const fetchMediaById = (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const item = generateMediaItem(parseInt(id) - 1);
-      resolve(item);
-    }, 500);
-  });
+export const fetchMediaById = async (id) => {
+  const res = await fetch(`/api/media/${id}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch media');
+  }
+  const item = await res.json();
+  return {
+    ...item,
+    type: item.type.toLowerCase(),
+    src: item.googleDriveUrl,
+    thumbnail: item.thumbnailUrl,
+    likes: item.likesCount,
+    views: item.viewsCount,
+  };
 };
 
-export const fetchSuggestions = (type, excludeId) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const items = [];
-      for (let i = 0; i < 8; i++) {
-        const item = generateMediaItem(i, type);
-        item.id = (++idCounter).toString(); // ensure unique
-        items.push(item);
-      }
-      resolve(items);
-    }, 800);
-  });
+export const fetchSuggestions = async (type, excludeId, limit = 8) => {
+  const items = await fetchMediaBatch(0, limit, type.toUpperCase());
+  return items.filter((item) => item.id !== excludeId);
 };
 
-export const searchMedia = (query, type = null) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const items = [];
-      for (let i = 0; i < 15; i++) {
-        const item = generateMediaItem(i, type);
-        item.title = `${query} - ${item.title}`;
-        items.push(item);
-      }
-      resolve(items);
-    }, 1000);
-  });
-};
-
+// Authentication remains mocked for now
 export const loginUser = (email, password) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {

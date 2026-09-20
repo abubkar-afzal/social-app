@@ -23,6 +23,8 @@ import PressScreen from '../../packages/ui/src/components/mobile/PressScreen';
 import BlogScreen from '../../packages/ui/src/components/mobile/BlogScreen';
 import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
+import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
+setApiBaseUrl('http://192.168.0.102:3000');
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

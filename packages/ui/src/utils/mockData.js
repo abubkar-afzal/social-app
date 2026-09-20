@@ -1,4 +1,5 @@
 let idCounter = 0;
+import { apiUrl } from './apiConfig';
 
 export const generateMediaItem = (index, type = null) => {
   const types = ['video', 'photo', 'audio'];
@@ -59,42 +60,46 @@ export const generateMediaItem = (index, type = null) => {
 
 export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
   const params = new URLSearchParams({ page, limit: pageSize });
-  if (type) params.append('type', type.toUpperCase());
-  const res = await fetch(`/api/media?${params}`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch media');
-  }
+  if (type) params.append('type', String(type).toUpperCase());
+  const res = await fetch(apiUrl(`/api/media?${params}`));
+  if (!res.ok) throw new Error('Failed to fetch media');
   const data = await res.json();
   return data.media.map((item) => ({
     ...item,
-    type: item.type.toLowerCase(),          // convert 'VIDEO' -> 'video'
-    src: item.googleDriveUrl,               // direct download link
-    thumbnail: item.thumbnailUrl,           // preserve thumbnail
+    type: item.type.toLowerCase(),
+    src: apiUrl(`/api/media/stream?id=${item.googleDriveFileId}`),
+    thumbnail: item.thumbnailUrl || null,
     likes: item.likesCount,
     views: item.viewsCount,
+    user: item.user?.name || 'Unknown User',
+    userAvatar: item.user?.avatarUrl || 'https://i.pravatar.cc/150?img=1',
   }));
 };
 
 export const fetchMediaById = async (id) => {
-  const res = await fetch(`/api/media/${id}`);
+  const res = await fetch(apiUrl(`/api/media/${id}`));
   if (!res.ok) {
-    throw new Error('Failed to fetch media');
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to fetch media');
   }
   const item = await res.json();
   return {
     ...item,
     type: item.type.toLowerCase(),
-    src: item.googleDriveUrl,
-    thumbnail: item.thumbnailUrl,
+    src: apiUrl(`/api/media/stream?id=${item.googleDriveFileId}`),
+    thumbnail: item.thumbnailUrl || null,
     likes: item.likesCount,
     views: item.viewsCount,
+    user: item.user?.name || 'Unknown User',
+    userAvatar: item.user?.avatarUrl || 'https://i.pravatar.cc/150?img=1',
   };
 };
 
 export const fetchSuggestions = async (type, excludeId, limit = 8) => {
-  const items = await fetchMediaBatch(0, limit, type.toUpperCase());
+  const items = await fetchMediaBatch(0, limit, type);
   return items.filter((item) => item.id !== excludeId);
 };
+
 
 // Authentication remains mocked for now
 export const loginUser = (email, password) => {

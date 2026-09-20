@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayIcon, PauseIcon, BookmarkIcon, HeartIcon } from '../../icons';
 import { fetchMediaBatch } from '../../utils/mockData';
-
 const HeroSkeleton = () => (
   <div className="rounded-lg overflow-hidden bg-surface shadow-sm">
     <div className="aspect-[3/4] bg-border animate-pulse" />
@@ -95,14 +94,17 @@ export default function DesktopHero() {
     );
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
+    
   }, [page, hasMore]);
 
   const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
   const loadHeroItems = async (pageNum) => {
     const items = await fetchMediaBatch(pageNum, 15);
+    console.log(fetchMediaBatch());
     if (pageNum === 0) {
       setHeroItems(shuffle(items));
+
       setLoading(false);
     } else {
       if (items.length === 0) setHasMore(false);

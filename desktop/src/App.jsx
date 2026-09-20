@@ -15,6 +15,9 @@ import PressPage from '../../packages/ui/src/components/desktop/PressPage';
 import BlogPage from '../../packages/ui/src/components/desktop/BlogPage';
 import HelpPage from '../../packages/ui/src/components/desktop/HelpPage';
 import GuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
+import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
+
+setApiBaseUrl('http://localhost:3000'); // Replace with your actual API base URL
 
 export default function App() {
   return (

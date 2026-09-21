@@ -1,5 +1,5 @@
 let idCounter = 0;
-import { apiUrl } from './apiConfig';
+import { apiUrl, authFetch } from './apiConfig';
 
 export const generateMediaItem = (index, type = null) => {
   const types = ['video', 'photo', 'audio'];
@@ -61,7 +61,7 @@ export const generateMediaItem = (index, type = null) => {
 export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
   const params = new URLSearchParams({ page, limit: pageSize });
   if (type) params.append('type', String(type).toUpperCase());
-  const res = await fetch(apiUrl(`/api/media?${params}`));
+  const res = await authFetch(apiUrl(`/api/media?${params}`));
   if (!res.ok) throw new Error('Failed to fetch media');
   const data = await res.json();
   return data.media.map((item) => ({

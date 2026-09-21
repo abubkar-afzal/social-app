@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   SearchIcon,
   PlusIcon,
@@ -10,6 +10,7 @@ import {
   Cog6ToothIcon as SettingsIcon,
   ArrowRightOnRectangleIcon as LogoutIcon,
 } from '../../icons';
+import { useAuth } from '../../utils/useAuth';
 
 export default function DesktopNavbar() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +19,8 @@ export default function DesktopNavbar() {
   const moreRef = useRef(null);
   const userRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuth();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -29,12 +32,8 @@ export default function DesktopNavbar() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (moreRef.current && !moreRef.current.contains(event.target)) {
-        setMoreOpen(false);
-      }
-      if (userRef.current && !userRef.current.contains(event.target)) {
-        setUserOpen(false);
-      }
+      if (moreRef.current && !moreRef.current.contains(event.target)) setMoreOpen(false);
+      if (userRef.current && !userRef.current.contains(event.target)) setUserOpen(false);
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -49,11 +48,13 @@ export default function DesktopNavbar() {
     { label: 'Guidelines', path: '/guidelines' },
   ];
 
-  const userLinks = [
-    { label: 'Profile', path: '/login', icon: ProfileIcon },
-    { label: 'Settings', path: '/settings', icon: SettingsIcon },
-    { label: 'Logout', path: '/logout', icon: LogoutIcon },
-  ];
+  const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    setUserOpen(false);
+    navigate('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
@@ -66,12 +67,19 @@ export default function DesktopNavbar() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-1">
-          <Link to="/" className="px-4 py-2 rounded-full text-sm font-medium text-text hover:bg-background">Home</Link>
-          <Link to="/videos" className="px-4 py-2 rounded-full text-sm font-medium text-text hover:bg-background">Videos</Link>
-          <Link to="/photos" className="px-4 py-2 rounded-full text-sm font-medium text-text hover:bg-background">Photos</Link>
-          <Link to="/audio" className="px-4 py-2 rounded-full text-sm font-medium text-text hover:bg-background">Audio</Link>
+          <Link to="/" className={`px-4 py-2 rounded-full text-sm font-medium transition ${isActive('/') ? 'bg-primary text-white' : 'text-text hover:bg-background'}`}>
+            Home
+          </Link>
+          <Link to="/videos" className={`px-4 py-2 rounded-full text-sm font-medium transition ${isActive('/videos') ? 'bg-primary text-white' : 'text-text hover:bg-background'}`}>
+            Videos
+          </Link>
+          <Link to="/photos" className={`px-4 py-2 rounded-full text-sm font-medium transition ${isActive('/photos') ? 'bg-primary text-white' : 'text-text hover:bg-background'}`}>
+            Photos
+          </Link>
+          <Link to="/audio" className={`px-4 py-2 rounded-full text-sm font-medium transition ${isActive('/audio') ? 'bg-primary text-white' : 'text-text hover:bg-background'}`}>
+            Audio
+          </Link>
 
-          {/* More Dropdown */}
           <div className="relative" ref={moreRef}>
             <button
               onClick={() => setMoreOpen(!moreOpen)}
@@ -113,44 +121,73 @@ export default function DesktopNavbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Link to="/create" className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark transition">
-            <PlusIcon className="h-5 w-5" />
-          </Link>
-          <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
-            <BellIcon className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
-          </button>
-          <Link to="/#" className="rounded-full p-2 text-text-secondary hover:bg-background">
-            <BookmarkIcon className="h-5 w-5" />
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/uploadmedia"
+                className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark transition"
+                title="Create"
+              >
+                <PlusIcon className="h-5 w-5" />
+              </Link>
+              <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
+                <BellIcon className="h-5 w-5" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
+              </button>
+              <Link to="/account" className="rounded-full p-2 text-text-secondary hover:bg-background">
+                <BookmarkIcon className="h-5 w-5" />
+              </Link>
 
-          {/* User Dropdown */}
-          <div className="relative" ref={userRef}>
-            <button
-              onClick={() => setUserOpen(!userOpen)}
-              className="rounded-full p-1 border-2 border-primary hover:bg-background transition"
-            >
-              <ProfileIcon className="h-6 w-6 text-primary" />
-            </button>
-            {userOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg border border-border py-2 z-50">
-                {userLinks.map((item) => {
-                  const Icon = item.icon;
-                  return (
+              {/* User Dropdown */}
+              <div className="relative" ref={userRef}>
+                <button
+                  onClick={() => setUserOpen(!userOpen)}
+                  className="rounded-full p-1 border-2 border-primary hover:bg-background transition overflow-hidden"
+                >
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name || 'User'} className="w-6 h-6 rounded-full object-cover" />
+                  ) : (
+                    <ProfileIcon className="h-6 w-6 text-primary" />
+                  )}
+                </button>
+                {userOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-surface rounded-lg shadow-lg border border-border py-2 z-50">
+                    <div className="px-4 py-3 border-b border-border">
+                      <p className="font-semibold text-text text-sm truncate">{user.name || 'User'}</p>
+                      <p className="text-text-secondary text-xs truncate">{user.email}</p>
+                    </div>
                     <Link
-                      key={item.label}
-                      to={item.path}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background hover:text-primary"
+                      to="/account"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background"
                       onClick={() => setUserOpen(false)}
                     >
-                      <Icon className="h-5 w-5" />
-                      {item.label}
+                      <ProfileIcon className="h-5 w-5" /> Profile
                     </Link>
-                  );
-                })}
+                    <Link
+                      to="/settings"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background"
+                      onClick={() => setUserOpen(false)}
+                    >
+                      <SettingsIcon className="h-5 w-5" /> Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-background"
+                    >
+                      <LogoutIcon className="h-5 w-5" /> Logout
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="rounded-full bg-primary text-white px-6 py-2 text-sm font-medium hover:bg-primary-dark transition"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -8,15 +8,10 @@ import {
   ProfileIcon,
   BookmarkIcon,
   ChevronDownIcon,
-  EllipsisHorizontalIcon,
-  HomeIcon,
-  VideoIcon,
-  ImageIcon,
-  AudioIcon,
   Cog6ToothIcon as SettingsIcon,
   ArrowRightOnRectangleIcon as LogoutIcon,
-  UserIcon,
 } from '../../icons';
+import { useAuth } from '../../utils/useAuth';
 
 export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +21,7 @@ export default function Navbar() {
   const moreRef = useRef(null);
   const userRef = useRef(null);
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -36,15 +32,10 @@ export default function Navbar() {
     }
   };
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (moreRef.current && !moreRef.current.contains(event.target)) {
-        setMoreOpen(false);
-      }
-      if (userRef.current && !userRef.current.contains(event.target)) {
-        setUserOpen(false);
-      }
+      if (moreRef.current && !moreRef.current.contains(event.target)) setMoreOpen(false);
+      if (userRef.current && !userRef.current.contains(event.target)) setUserOpen(false);
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -52,7 +43,6 @@ export default function Navbar() {
 
   const moreLinks = [
     { label: 'About', href: '/about' },
-    { label: 'Our Story', href: '/about#story' },
     { label: 'Careers', href: '/careers' },
     { label: 'Press', href: '/press' },
     { label: 'Blog', href: '/blog' },
@@ -60,11 +50,11 @@ export default function Navbar() {
     { label: 'Guidelines', href: '/guidelines' },
   ];
 
-  const userLinks = [
-    { label: 'Profile', href: '/login', icon: ProfileIcon },
-    { label: 'Settings', href: '/settings', icon: SettingsIcon },
-    { label: 'Logout', href: '/logout', icon: LogoutIcon },
-  ];
+  const handleLogout = () => {
+    logout();
+    setUserOpen(false);
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full bg-surface border-b border-border shadow-sm">
@@ -91,7 +81,6 @@ export default function Navbar() {
               Audio
             </Link>
 
-            {/* More Dropdown */}
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
@@ -132,51 +121,82 @@ export default function Navbar() {
           </div>
 
           {/* Mobile search toggle */}
-          <button onClick={() => setSearchOpen(!searchOpen)} className="md:hidden rounded-full p-2 text-text-secondary hover:bg-background">
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="md:hidden rounded-full p-2 text-text-secondary hover:bg-background"
+          >
             <SearchIcon className="h-6 w-6" />
           </button>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <Link href="/create" className="hidden sm:flex items-center gap-1 rounded-full bg-primary text-white px-4 py-2 text-sm font-medium hover:bg-primary-dark transition">
-              <PlusIcon className="h-5 w-5" />
-              Create
-            </Link>
-            <Link href="/#" className="rounded-full p-2 text-text-secondary hover:bg-background">
-              <BookmarkIcon className="h-6 w-6" />
-            </Link>
-            <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
-              <BellIcon className="h-6 w-6" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
-            </button>
+            {user ? (
+              <>
+                <Link
+                  href="/uploadmedia"
+                  className="hidden sm:flex items-center gap-1 rounded-full bg-primary text-white px-4 py-2 text-sm font-medium hover:bg-primary-dark transition"
+                >
+                  <PlusIcon className="h-5 w-5" />
+                  Create
+                </Link>
+                <Link href="/account" className="rounded-full p-2 text-text-secondary hover:bg-background">
+                  <BookmarkIcon className="h-6 w-6" />
+                </Link>
+                <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
+                  <BellIcon className="h-6 w-6" />
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
+                </button>
 
-            {/* User Dropdown */}
-            <div className="relative" ref={userRef}>
-              <button
-                onClick={() => setUserOpen(!userOpen)}
-                className="rounded-full p-1 border-2 border-primary hover:bg-background transition"
-              >
-                <ProfileIcon className="h-7 w-7 text-primary" />
-              </button>
-              {userOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg border border-border py-2 z-50">
-                  {userLinks.map((item) => {
-                    const Icon = item.icon;
-                    return (
+                {/* User Dropdown */}
+                <div className="relative" ref={userRef}>
+                  <button
+                    onClick={() => setUserOpen(!userOpen)}
+                    className="rounded-full p-1 border-2 border-primary hover:bg-background transition overflow-hidden"
+                  >
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name || 'User'} className="w-7 h-7 rounded-full object-cover" />
+                    ) : (
+                      <ProfileIcon className="h-7 w-7 text-primary" />
+                    )}
+                  </button>
+                  {userOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-surface rounded-lg shadow-lg border border-border py-2 z-50">
+                      <div className="px-4 py-3 border-b border-border">
+                        <p className="font-semibold text-text text-sm truncate">{user.name || 'User'}</p>
+                        <p className="text-text-secondary text-xs truncate">{user.email}</p>
+                      </div>
                       <Link
-                        key={item.label}
-                        href={item.href}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background hover:text-primary"
+                        href="/account"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background"
                         onClick={() => setUserOpen(false)}
                       >
-                        <Icon className="h-5 w-5" />
-                        {item.label}
+                        <ProfileIcon className="h-5 w-5" /> Profile
                       </Link>
-                    );
-                  })}
+                      <Link
+                        href="/settings"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-background"
+                        onClick={() => setUserOpen(false)}
+                      >
+                        <SettingsIcon className="h-5 w-5" /> Settings
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-background"
+                      >
+                        <LogoutIcon className="h-5 w-5" /> Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-full bg-primary text-white px-6 py-2 text-sm font-medium hover:bg-primary-dark transition"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
 
@@ -194,24 +214,6 @@ export default function Navbar() {
                 className="w-full rounded-full bg-background border border-border py-2 pl-10 pr-4 text-sm"
               />
             </form>
-          </div>
-        )}
-
-        {/* Mobile More Dropdown (simplified) */}
-        {searchOpen && (
-          <div className="md:hidden pb-3">
-            <div className="flex flex-col gap-1">
-              {moreLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="px-4 py-2 text-sm text-text hover:bg-background rounded"
-                  onClick={() => setSearchOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
           </div>
         )}
       </div>

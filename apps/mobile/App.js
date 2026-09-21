@@ -1,3 +1,5 @@
+import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
+setApiBaseUrl('http://192.168.0.102:3000');
 import './global.css';
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
@@ -23,11 +25,15 @@ import PressScreen from '../../packages/ui/src/components/mobile/PressScreen';
 import BlogScreen from '../../packages/ui/src/components/mobile/BlogScreen';
 import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
-import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
-setApiBaseUrl('http://192.168.0.102:3000');
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+export const GOOGLE_CONFIG = {
+  expoClientId: '1051290880207-d4q0sfd3l2dnfcesgh4o5tg7u4uiaurh.apps.googleusercontent.com',    // can reuse web
+  androidClientId: '1051290880207-qqhilo7t4f3qvig6n20snftv95o32s1k.apps.googleusercontent.com',
+  webClientId: '1051290880207-d4q0sfd3l2dnfcesgh4o5tg7u4uiaurh.apps.googleusercontent.com',
+};
 
 function HomeScreen() {
   return (

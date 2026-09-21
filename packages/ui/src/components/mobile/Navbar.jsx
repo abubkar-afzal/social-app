@@ -7,21 +7,24 @@ import {
   Modal,
   ScrollView,
   Platform,
+  Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useMobileAuth } from './useMobileAuth';
 
 export default function MobileNavbar() {
   const [search, setSearch] = useState('');
   const [moreVisible, setMoreVisible] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
+  const { user } = useMobileAuth();
 
   const tabs = [
     { label: 'Home', icon: '🏠', screen: 'Home' },
     { label: 'Videos', icon: '🎬', screen: 'Videos' },
     { label: 'Photos', icon: '🖼️', screen: 'Photos' },
     { label: 'Audio', icon: '🎵', screen: 'Audio' },
-    { label: 'Login', icon: '👤', screen: 'Login' },
+    { label: 'Account', icon: '👤', screen: 'Account' },
   ];
 
   const moreLinks = [
@@ -36,11 +39,17 @@ export default function MobileNavbar() {
   const handleTabPress = (screen) => {
     const tabScreens = tabs.map((t) => t.screen);
     if (tabScreens.includes(route.name)) {
-      // Already inside tab navigator
       navigation.navigate(screen);
     } else {
-      // Navigate to Main tab first, then target screen
       navigation.navigate('Main', { screen });
+    }
+  };
+
+  const handleProfilePress = () => {
+    if (user) {
+      navigation.navigate('Account');
+    } else {
+      navigation.navigate('Login');
     }
   };
 
@@ -55,8 +64,15 @@ export default function MobileNavbar() {
           <Text className="text-2xl">🏠</Text>
         </TouchableOpacity>
         <Text className="text-xl font-bold text-primary">PinShare</Text>
-        <TouchableOpacity onPress={() => setMoreVisible(true)} className="p-2">
-          <Text className="text-2xl">☰</Text>
+        <TouchableOpacity onPress={handleProfilePress} className="p-2">
+          {user?.avatarUrl ? (
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={{ width: 32, height: 32, borderRadius: 16 }}
+            />
+          ) : (
+            <Text className="text-2xl">👤</Text>
+          )}
         </TouchableOpacity>
       </View>
 

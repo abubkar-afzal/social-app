@@ -1,5 +1,6 @@
 import { prisma } from '../../../lib/prisma';
 import { uploadToGoogleDrive } from '../../../lib/googleDrive';
+import { verifyToken } from '../../../lib/jwt';
 import { IncomingForm } from 'formidable';
 import fs from 'fs';
 
@@ -33,16 +34,28 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Ensure a demo user exists
-      let user = await prisma.user.findUnique({ where: { email: 'demo@example.com' } });
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            email: 'demo@example.com',
-            name: 'Demo User',
-            avatarUrl: 'https://i.pravatar.cc/150?img=5',
-          },
-        });
+      // Determine user from JWT or fallback to demo user
+      const auth = req.headers.authorization || '';
+      const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      const jwtPayload = token ? verifyToken(token) : null;
+
+      let userId;
+
+      if (jwtPayload?.userId) {
+        userId = jwtPayload.userId;
+      } else {
+        // Fallback: find or create a demo user (for development)
+        let demo = await prisma.user.findUnique({ where: { email: 'demo@example.com' } });
+        if (!demo) {
+          demo = await prisma.user.create({
+            data: {
+              email: 'demo@example.com',
+              name: 'Demo User',
+              avatarUrl: 'https://i.pravatar.cc/150?img=5',
+            },
+          });
+        }
+        userId = demo.id;
       }
 
       const fileBuffer = fs.readFileSync(file.filepath);
@@ -57,16 +70,16 @@ export default async function handler(req, res) {
           description: description ? String(description) : null,
           type: String(type).toUpperCase(),
           googleDriveFileId: driveFile.id,
-          googleDriveUrl: `https://drive.google.com/uc?export=download&id=${driveFile.id}`,
-          thumbnailUrl: driveFile.thumbnailLink || null,   // <-- store thumbnail URL
+          googleDriveUrl: driveFile.webViewLink || null,
+          thumbnailUrl: driveFile.thumbnailLink || null,
           size: file.size || 0,
           mimeType,
-          userId: user.id,
+          userId,
         },
       });
 
       // Clean up temp file
-      fs.unlinkSync(file.filepath);
+      try { fs.unlinkSync(file.filepath); } catch (e) {}
 
       return res.status(201).json(media);
     } catch (error) {

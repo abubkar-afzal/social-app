@@ -1,21 +1,15 @@
+// Outline icons
 export {
   HomeIcon,
   VideoCameraIcon as VideoIcon,
-  VideoCameraIcon,
   PhotoIcon as ImageIcon,
-  PhotoIcon,
   MusicalNoteIcon as AudioIcon,
-  MusicalNoteIcon,
   UserIcon as ProfileIcon,
-  UserIcon,
   MagnifyingGlassIcon as SearchIcon,
-  MagnifyingGlassIcon,
   PlusIcon,
   BellIcon,
   BookmarkIcon,
-  Cog6ToothIcon as SettingsIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon as LogoutIcon,
   ArrowRightOnRectangleIcon,
   PlayIcon,
   PauseIcon,
@@ -27,12 +21,13 @@ export {
   ShareIcon,
   ChatBubbleOvalLeftIcon as CommentIcon,
   EllipsisHorizontalIcon as MoreIcon,
-  XMarkIcon as CloseIcon,
+  XMarkIcon,
   CheckIcon,
   TrashIcon,
-  PencilSquareIcon as EditIcon,
+  PencilSquareIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
+  ArrowDownTrayIcon as DownloadIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   EyeIcon,
@@ -47,7 +42,11 @@ export {
   TagIcon,
 } from '@heroicons/react/24/outline';
 
+// Solid icons
 export {
   HeartIcon as HeartIconSolid,
   BookmarkIcon as BookmarkIconSolid,
+  StarIcon,
+  CheckCircleIcon as CheckCircleSolid,
+  XCircleIcon as XCircleSolid,
 } from '@heroicons/react/24/solid';

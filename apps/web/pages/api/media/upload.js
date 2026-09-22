@@ -39,30 +39,20 @@ export default async function handler(req, res) {
       const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
       const jwtPayload = token ? verifyToken(token) : null;
 
-      let userId;
+        if (!jwtPayload?.userId) {
+    return res.status(401).json({ error: 'Unauthorized. Please sign in.' });
+  }
 
-      if (jwtPayload?.userId) {
-        userId = jwtPayload.userId;
-      } else {
-        // Fallback: find or create a demo user (for development)
-        let demo = await prisma.user.findUnique({ where: { email: 'demo@example.com' } });
-        if (!demo) {
-          demo = await prisma.user.create({
-            data: {
-              email: 'demo@example.com',
-              name: 'Demo User',
-              avatarUrl: 'https://i.pravatar.cc/150?img=5',
-            },
-          });
-        }
-        userId = demo.id;
-      }
+  const userId = jwtPayload.userId;
 
       const fileBuffer = fs.readFileSync(file.filepath);
       const mimeType = file.mimetype || 'application/octet-stream';
       const fileName = file.originalFilename || 'upload';
 
-      const driveFile = await uploadToGoogleDrive(fileBuffer, fileName, mimeType);
+      const driveFile = await uploadToGoogleDrive(fileBuffer, fileName, mimeType, {
+  folderId: process.env.GOOGLE_DRIVE_FOLDER_ID, // media folder
+  skipThumbnail: !mimeType.startsWith('image/') && !mimeType.startsWith('video/'),
+});
 
       const media = await prisma.media.create({
         data: {

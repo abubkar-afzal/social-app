@@ -25,6 +25,7 @@ import PressScreen from '../../packages/ui/src/components/mobile/PressScreen';
 import BlogScreen from '../../packages/ui/src/components/mobile/BlogScreen';
 import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
+import UploadMediaScreen from '../../packages/ui/src/components/mobile/UploadMediaScreen';
 
 
 const Stack = createStackNavigator();
@@ -127,6 +128,7 @@ export default function App() {
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="MediaDetail" component={MobileMediaDetail} />
         <Stack.Screen name="Login" component={MobileLogin} />
+        <Stack.Screen name="UploadMedia" component={UploadMediaScreen} />
         <Stack.Screen name="About">
           {() => (
             <ExtraPageWrapper>

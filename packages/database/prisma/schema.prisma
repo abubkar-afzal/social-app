@@ -17,8 +17,14 @@ model User {
   bio           String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
   media         Media[]
   likes         Like[]
+  favorites     Favorite[]
+  comments      Comment[]
+  views         View[]
+  following     Follow[] @relation("Follower")
+  followers     Follow[] @relation("Following")
 }
 
 enum MediaType {
@@ -41,12 +47,62 @@ model Media {
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   likesCount        Int       @default(0)
   viewsCount        Int       @default(0)
+  favoritesCount    Int       @default(0)
+  commentsCount     Int       @default(0)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
   likes             Like[]
+  favorites         Favorite[]
+  comments          Comment[]
+  views             View[]
 }
 
 model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  mediaId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  mediaId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // the user who follows
+  followingId String   // the user being followed
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("Follower",  fields: [followerId],  references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  userId    String
+  mediaId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+model View {
   id        String   @id @default(cuid())
   userId    String
   mediaId   String
@@ -56,4 +112,5 @@ model Like {
   media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
   @@unique([userId, mediaId])
+  @@index([mediaId])
 }

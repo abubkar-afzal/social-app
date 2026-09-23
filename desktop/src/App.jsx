@@ -39,6 +39,7 @@ export default function App() {
 <Route path="/blog" element={<BlogPage />} />
 <Route path="/help" element={<HelpPage />} />
 <Route path="/guidelines" element={<GuidelinesPage />} />
+<Route path="/uploadmedia" element={<DesktopUploadMedia />} />
           </Routes>
         </main>
         <DesktopFooter />

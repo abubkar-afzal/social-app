@@ -18,6 +18,12 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: 'Not found' });
   }
 
+  // GET — single media
+  if (req.method === 'GET') {
+    return res.status(200).json(existing);
+  }
+
+  // DELETE — remove media
   if (req.method === 'DELETE') {
     try {
       await prisma.media.delete({ where: { id } });
@@ -28,18 +34,21 @@ export default async function handler(req, res) {
     }
   }
 
+  // PUT / PATCH — update title, description, type
   if (req.method === 'PUT' || req.method === 'PATCH') {
-    const { title, description } = req.body || {};
+    const { title, description, type } = req.body || {};
     try {
       const updated = await prisma.media.update({
         where: { id },
         data: {
           title: title !== undefined ? String(title) : undefined,
           description: description !== undefined ? String(description) : undefined,
+          type: type !== undefined ? String(type).toUpperCase() : undefined,
         },
       });
       return res.status(200).json(updated);
     } catch (error) {
+      console.error('Update error:', error);
       return res.status(500).json({ error: 'Update failed' });
     }
   }

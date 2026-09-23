@@ -69,13 +69,10 @@ export default function DesktopLogin() {
     try {
       if (isLogin) {
         const user = await loginUser(email, password);
-        console.log('Logged in:', user);
-        // For mock auth, set a placeholder token
         setStoredToken('demo-token');
         navigate('/');
       } else {
         const user = await registerUser(name, email, password);
-        console.log('Registered:', user);
         setStoredToken('demo-token');
         navigate('/');
       }

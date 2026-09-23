@@ -1,23 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchMediaById, fetchSuggestions } from '../../utils/mockData';
-import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon, HeartIcon, ShareIcon, CommentIcon, MoreIcon } from '../../icons';
+import { apiUrl, authFetch } from '../../utils/apiConfig';
+import { useAuth } from '../../utils/useAuth';
+import {
+  PlayIcon, PauseIcon, BookmarkIcon, HeartIcon, ShareIcon, EyeIcon,
+} from '../../icons';
 
-// Video Player
+const getUserDisplayName = (user) => {
+  if (!user) return 'Unknown';
+  return user.name || user.email?.split('@')[0] || 'User';
+};
+
+const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
+
 const VideoPlayer = ({ src }) => {
   const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef(null);
   return (
     <div className="relative">
-      <video
-        ref={videoRef}
-        src={src}
-        className="w-full aspect-video object-cover bg-black"
-        autoPlay
-        muted={isMuted}
-        loop
-        playsInline
-      />
+      <video src={src} className="w-full aspect-video object-cover bg-black" autoPlay muted={isMuted} loop playsInline controls />
       <button
         onClick={() => setIsMuted(!isMuted)}
         className="absolute bottom-4 right-4 rounded-full bg-black/60 p-2 text-white hover:bg-black/80"
@@ -28,7 +29,6 @@ const VideoPlayer = ({ src }) => {
   );
 };
 
-// Audio Player
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -37,27 +37,24 @@ const AudioPlayer = ({ src }) => {
   const audioRef = useRef(null);
 
   const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.pause();
+    else audioRef.current.play();
+    setIsPlaying(!isPlaying);
+  };
+  const onTimeUpdate = () => {
     if (audioRef.current) {
-      if (isPlaying) audioRef.current.pause();
-      else audioRef.current.play();
-      setIsPlaying(!isPlaying);
+      const c = audioRef.current.currentTime;
+      const d = audioRef.current.duration || 1;
+      setCurrentTime(c);
+      setDuration(d);
+      setProgress((c / d) * 100);
     }
   };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      const current = audioRef.current.currentTime;
-      const dur = audioRef.current.duration;
-      setCurrentTime(current);
-      setDuration(dur);
-      setProgress((current / dur) * 100);
-    }
-  };
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const fmt = (t) => {
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -69,25 +66,18 @@ const AudioPlayer = ({ src }) => {
       </div>
       <div className="w-full max-w-md">
         <div className="flex justify-between text-white text-sm mb-2">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{fmt(currentTime)}</span>
+          <span>{fmt(duration)}</span>
         </div>
-        <div className="w-full bg-white/20 rounded-full h-2 cursor-pointer">
+        <div className="w-full bg-white/20 rounded-full h-2">
           <div className="bg-white h-2 rounded-full" style={{ width: `${progress}%` }} />
         </div>
       </div>
-      <audio
-        ref={audioRef}
-        src={src}
-        className="hidden"
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={() => setIsPlaying(false)}
-      />
+      <audio ref={audioRef} src={src} className="hidden" onTimeUpdate={onTimeUpdate} onEnded={() => setIsPlaying(false)} />
     </div>
   );
 };
 
-// Suggestion Card
 const SuggestionCard = ({ item }) => (
   <Link to={`/media/${item.id}`}>
     <div className="group rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
@@ -116,10 +106,6 @@ const SuggestionCard = ({ item }) => (
         )}
       </div>
       <div className="p-3">
-        <div className="flex items-center gap-2 mb-1">
-          <img src={item.userAvatar} alt={item.user} className="w-6 h-6 rounded-full" />
-          <span className="text-xs text-text-secondary truncate">{item.user}</span>
-        </div>
         <p className="text-sm font-semibold truncate">{item.title}</p>
         <p className="text-xs text-text-secondary">{item.views} views</p>
       </div>
@@ -128,38 +114,146 @@ const SuggestionCard = ({ item }) => (
 );
 
 export default function DesktopMediaDetail() {
-  const { id } = useParams();
+  const { id: mediaId } = useParams();
+  const { user } = useAuth();
+
   const [media, setMedia] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [comment, setComment] = useState('');
+
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [favorited, setFavorited] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  const [following, setFollowing] = useState(false);
+  const [isOwnPost, setIsOwnPost] = useState(false);
+
   const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [postingComment, setPostingComment] = useState(false);
 
   useEffect(() => {
-    loadMedia();
-  }, [id]);
+    if (mediaId) loadMedia();
+  }, [mediaId, user?.id]);
 
   const loadMedia = async () => {
     setLoading(true);
-    const item = await fetchMediaById(id);
-    setMedia(item);
-    const sugg = await fetchSuggestions(item.type, id);
-    setSuggestions(sugg);
+    try {
+      const item = await fetchMediaById(mediaId);
+      setMedia(item);
+      setLikesCount(item.likesCount || 0);
+      setFavoritesCount(item.favoritesCount || 0);
+      setLiked(item.liked || false);
+      setFavorited(item.favorited || false);
+      setFollowing(item.following || false);
+      setIsOwnPost(item.isOwnPost || false);
+
+      authFetch(apiUrl(`/api/media/${mediaId}/view`), { method: 'POST' }).catch(() => {});
+
+      try {
+        const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data.comments || []);
+        }
+      } catch (e) { console.error(e); }
+
+      const sugg = await fetchSuggestions(item.type, mediaId);
+      setSuggestions(sugg);
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
-  const addComment = (e) => {
-    e.preventDefault();
-    if (comment.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, user: 'Demo User', avatar: 'https://i.pravatar.cc/150?img=5', text: comment, time: 'Just now' },
-      ]);
-      setComment('');
+  const requireAuth = () => {
+    if (!user) {
+      alert('Please sign in to use this feature.');
+      return false;
     }
+    return true;
+  };
+
+  const toggleLike = async () => {
+    if (!requireAuth()) return;
+    const next = !liked;
+    setLiked(next);
+    setLikesCount((c) => c + (next ? 1 : -1));
+    try {
+      await authFetch(apiUrl(`/api/media/${mediaId}/like`), { method: next ? 'POST' : 'DELETE' });
+    } catch (e) {
+      setLiked(!next);
+      setLikesCount((c) => c + (next ? -1 : 1));
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!requireAuth()) return;
+    const next = !favorited;
+    setFavorited(next);
+    setFavoritesCount((c) => c + (next ? 1 : -1));
+    try {
+      await authFetch(apiUrl(`/api/media/${mediaId}/favorite`), { method: next ? 'POST' : 'DELETE' });
+    } catch (e) {
+      setFavorited(!next);
+      setFavoritesCount((c) => c + (next ? -1 : 1));
+    }
+  };
+
+  const toggleFollow = async () => {
+    if (!requireAuth() || isOwnPost) return;
+    const next = !following;
+    setFollowing(next);
+    try {
+      await authFetch(apiUrl(`/api/user/${media.userId}/follow`), { method: next ? 'POST' : 'DELETE' });
+    } catch (e) { setFollowing(!next); }
+  };
+
+  const shareMedia = async () => {
+    const url = `http://localhost:3000/media/${media.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: media.title,
+          text: media.description || 'Check out this post on PinShare!',
+          url,
+        });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+      }
+    } catch (e) {}
+  };
+
+  const submitComment = async (e) => {
+    e.preventDefault();
+    if (!requireAuth()) return;
+    if (!commentText.trim()) return;
+    setPostingComment(true);
+    try {
+      const res = await authFetch(apiUrl(`/api/media/${mediaId}/comments`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: commentText }),
+      });
+      if (res.ok) {
+        const newComment = await res.json();
+        setComments((prev) => [newComment, ...prev]);
+        setCommentText('');
+      }
+    } catch (e) { console.error(e); }
+    setPostingComment(false);
+  };
+
+  const deleteComment = async (commentId) => {
+    if (!requireAuth()) return;
+    if (!confirm('Delete this comment?')) return;
+    try {
+      const res = await authFetch(apiUrl(`/api/media/${mediaId}/comments`), {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ commentId }),
+      });
+      if (res.ok) setComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (e) { console.error(e); }
   };
 
   if (loading || !media) {
@@ -170,10 +264,11 @@ export default function DesktopMediaDetail() {
     );
   }
 
+  const posterName = getUserDisplayName(media.user);
+
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
         <div className="lg:col-span-2">
           <div className="rounded-xl overflow-hidden bg-surface shadow-lg">
             {media.type === 'video' && <VideoPlayer src={media.src} />}
@@ -182,91 +277,134 @@ export default function DesktopMediaDetail() {
           </div>
 
           <div className="mt-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-text">{media.title}</h1>
-                <p className="text-text-secondary mt-1">{media.description}</p>
-                <div className="flex gap-2 mt-3">
-                  {media.tags?.map((tag) => (
-                    <span key={tag} className="text-xs bg-background px-3 py-1 rounded-full text-text-secondary">#{tag}</span>
-                  ))}
-                </div>
-              </div>
-              <button className="p-2 rounded-full hover:bg-background"><MoreIcon className="h-6 w-6 text-text-secondary" /></button>
-            </div>
+            <h1 className="text-2xl font-bold text-text">{media.title}</h1>
+            {media.description && <p className="text-text-secondary mt-1">{media.description}</p>}
 
-            <div className="flex gap-6 mt-4 text-sm">
+            <div className="flex flex-wrap gap-3 mt-4">
               <button
-                onClick={() => setIsLiked(!isLiked)}
-                className={`flex items-center gap-2 ${isLiked ? 'text-primary' : 'text-text-secondary'}`}
+                onClick={toggleLike}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
+                  liked ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
+                }`}
               >
-                <HeartIcon className="h-6 w-6" />
-                <span>{media.likes + (isLiked ? 1 : 0)}</span>
+                <HeartIcon className="h-5 w-5" />
+                <span>{likesCount}</span>
               </button>
+
               <button
-                onClick={() => setIsSaved(!isSaved)}
-                className={`flex items-center gap-2 ${isSaved ? 'text-primary' : 'text-text-secondary'}`}
+                onClick={toggleFavorite}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
+                  favorited ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
+                }`}
               >
-                <BookmarkIcon className="h-6 w-6" />
-                <span>{media.saves + (isSaved ? 1 : 0)}</span>
+                <BookmarkIcon className="h-5 w-5" />
+                <span>{favoritesCount}</span>
               </button>
-              <button className="flex items-center gap-2 text-text-secondary">
-                <ShareIcon className="h-6 w-6" />
+
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text-secondary">
+                <EyeIcon className="h-5 w-5" />
+                <span>{media.viewsCount || 0}</span>
+              </div>
+
+              <button
+                onClick={shareMedia}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text hover:border-primary transition"
+              >
+                <ShareIcon className="h-5 w-5" />
                 <span>Share</span>
               </button>
             </div>
+          </div>
 
-            <div className="flex items-center gap-4 mt-6 bg-surface rounded-xl p-4">
-              <img src={media.userAvatar} alt={media.user} className="w-14 h-14 rounded-full" />
-              <div className="flex-1">
-                <p className="font-semibold text-text">{media.user}</p>
-                <p className="text-sm text-text-secondary">1.2k followers</p>
+          <div className="flex items-center gap-4 mt-6 bg-surface rounded-xl p-4">
+            {media.user?.avatarUrl ? (
+              <img src={media.user.avatarUrl} alt={posterName} className="w-14 h-14 rounded-full object-cover" />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold">
+                {getUserInitial(media.user)}
               </div>
+            )}
+            <div className="flex-1">
+              <p className="font-semibold text-text">{posterName}</p>
+              {media.user?.followersCount !== undefined && (
+                <p className="text-sm text-text-secondary">{media.user.followersCount} followers</p>
+              )}
+            </div>
+            {!isOwnPost && (
               <button
-                onClick={() => setIsFollowing(!isFollowing)}
+                onClick={toggleFollow}
                 className={`px-6 py-2 rounded-full font-medium transition ${
-                  isFollowing
-                    ? 'bg-background text-text border border-border'
-                    : 'bg-primary text-white hover:bg-primary-dark'
+                  following ? 'bg-background text-text border border-border' : 'bg-primary text-white hover:bg-primary-dark'
                 }`}
               >
-                {isFollowing ? 'Following' : 'Follow'}
+                {following ? 'Following' : 'Follow'}
               </button>
-            </div>
+            )}
+          </div>
 
-            <div className="mt-6">
-              <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
-              <form onSubmit={addComment} className="flex gap-3 mb-6">
-                <img src="https://i.pravatar.cc/150?img=5" alt="You" className="w-10 h-10 rounded-full" />
-                <input
-                  type="text"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="flex-1 bg-surface rounded-full px-4 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <button type="submit" className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark">Post</button>
-              </form>
+          <div className="mt-6">
+            <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
+
+            <form onSubmit={submitComment} className="flex gap-3 mb-6">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="You" className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
+                  {(user?.name || 'U')[0].toUpperCase()}
+                </div>
+              )}
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder={user ? 'Add a comment...' : 'Sign in to comment'}
+                disabled={!user}
+                className="flex-1 bg-surface rounded-full px-4 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={postingComment || !commentText.trim() || !user}
+                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark disabled:opacity-50"
+              >
+                {postingComment ? '...' : 'Post'}
+              </button>
+            </form>
+
+            {comments.length === 0 ? (
+              <p className="text-text-secondary text-sm">No comments yet. Be the first!</p>
+            ) : (
               <div className="space-y-4">
                 {comments.map((c) => (
                   <div key={c.id} className="flex gap-3">
-                    <img src={c.avatar} alt={c.user} className="w-10 h-10 rounded-full" />
-                    <div>
-                      <p className="font-semibold text-sm">{c.user}</p>
-                      <p className="text-text-secondary">{c.text}</p>
-                      <p className="text-xs text-text-secondary mt-1">{c.time}</p>
+                    {c.user.avatarUrl ? (
+                      <img src={c.user.avatarUrl} alt={c.user.name || 'User'} className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
+                        {(c.user.name || 'U')[0].toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">{c.user.name || 'User'}</p>
+                        <p className="text-xs text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</p>
+                        {user?.id === c.user.id && (
+                          <button onClick={() => deleteComment(c.id)} className="ml-auto text-error text-xs hover:underline">
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-text-secondary mt-1">{c.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Suggestions Sidebar */}
         <div className="lg:col-span-1">
           <h2 className="text-xl font-bold text-text mb-4">More like this</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {suggestions.map((item) => <SuggestionCard key={item.id} item={item} />)}
           </div>
         </div>

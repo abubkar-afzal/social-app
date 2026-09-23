@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { useAudioPlayer } from 'expo-audio';import { useNavigation } from '@react-navigation/native';
+import { useAudioPlayer } from 'expo-audio';
+import { useNavigation } from '@react-navigation/native';
 import { fetchMediaBatch } from '../../utils/mockData';
 
 const { width } = Dimensions.get('window');
@@ -17,52 +18,93 @@ const HeroSkeleton = () => (
   </View>
 );
 
-const PhotoCard = ({ photo, onPress }) => (
-  <TouchableOpacity className="bg-surface rounded-xl overflow-hidden shadow-md mb-3" style={{ width: CARD_WIDTH }} onPress={onPress} activeOpacity={0.85}>
-    <Image source={{ uri: photo.src }} style={{ width: '100%', aspectRatio: 1 }} />
-    <View className="p-2">
-      <Text className="text-sm font-medium text-text" numberOfLines={1}>{photo.title}</Text>
-      <Text className="text-xs text-text-secondary">{photo.views} views</Text>
-    </View>
-  </TouchableOpacity>
-);
-
-// In VideoCard:
 const VideoCard = ({ video, onPress }) => {
-  const player = useVideoPlayer(video.src, (player) => {
-    player.loop = true;
-    player.muted = true;
-    player.play();
+  const player = useVideoPlayer(video.src, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
   });
+
   return (
-    <TouchableOpacity style={{ width: CARD_WIDTH }} onPress={onPress} className="bg-surface rounded-xl overflow-hidden shadow-md mb-3">
-      <VideoView player={player} style={{ width: '100%', aspectRatio: 1 }} contentFit="cover" />
-      <View className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
+    <TouchableOpacity
+      className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+      style={{ width: CARD_WIDTH }}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
+      <VideoView
+        player={player}
+        style={{ width: '100%', aspectRatio: 1 }}
+        contentFit="cover"
+      />
+      <View className="absolute bottom-0 left-0 right-0 bg-black/60 p-2">
+        <View className="flex-row items-center gap-2 mb-1">
+          {video.user?.avatarUrl ? (
+            <Image source={{ uri: video.user.avatarUrl }} style={{ width: 20, height: 20, borderRadius: 10 }} />
+          ) : (
+            <View className="w-5 h-5 rounded-full bg-primary items-center justify-center">
+              <Text className="text-white text-xs font-bold">{(video.user?.name || 'U')[0].toUpperCase()}</Text>
+            </View>
+          )}
+          <Text className="text-white text-xs" numberOfLines={1}>{video.user?.name || 'User'}</Text>
+        </View>
         <Text className="text-white text-sm font-medium" numberOfLines={1}>{video.title}</Text>
-        <Text className="text-white/70 text-xs">{video.views} views</Text>
+        <Text className="text-white/70 text-xs">{video.viewsCount} views</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
-// In AudioCard:
+const PhotoCard = ({ photo, onPress }) => (
+  <TouchableOpacity
+    className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+    style={{ width: CARD_WIDTH }}
+    onPress={onPress}
+    activeOpacity={0.85}
+  >
+    <Image source={{ uri: photo.src }} style={{ width: '100%', aspectRatio: 1 }} />
+    <View className="p-2">
+      <View className="flex-row items-center gap-2 mb-1">
+        {photo.user?.avatarUrl ? (
+          <Image source={{ uri: photo.user.avatarUrl }} style={{ width: 20, height: 20, borderRadius: 10 }} />
+        ) : (
+          <View className="w-5 h-5 rounded-full bg-primary items-center justify-center">
+            <Text className="text-white text-xs font-bold">{(photo.user?.name || 'U')[0].toUpperCase()}</Text>
+          </View>
+        )}
+        <Text className="text-xs text-text-secondary" numberOfLines={1}>{photo.user?.name || 'User'}</Text>
+      </View>
+      <Text className="text-sm font-medium text-text" numberOfLines={1}>{photo.title}</Text>
+      <Text className="text-xs text-text-secondary">{photo.viewsCount} views</Text>
+    </View>
+  </TouchableOpacity>
+);
+
 const AudioCard = ({ audio, onPress }) => {
   const player = useAudioPlayer({ uri: audio.src });
   const [isPlaying, setIsPlaying] = useState(false);
-  const togglePlay = () => {
-    if (isPlaying) player.pause(); else player.play();
+
+  const togglePlay = (e) => {
+    if (isPlaying) player.pause();
+    else player.play();
     setIsPlaying(!isPlaying);
   };
+
   return (
-    <TouchableOpacity style={{ width: CARD_WIDTH }} onPress={onPress} className="bg-surface rounded-xl overflow-hidden shadow-md mb-3">
-      <View className="aspect-square items-center justify-center" style={{ backgroundColor: audio.color }}>
+    <TouchableOpacity
+      className="bg-surface rounded-xl overflow-hidden shadow-md mb-3"
+      style={{ width: CARD_WIDTH }}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
+      <View className="aspect-square items-center justify-center" style={{ backgroundColor: audio.color || '#e6005c' }}>
         <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-4 mb-2">
           <Text className="text-4xl">{isPlaying ? '⏸️' : '▶️'}</Text>
         </TouchableOpacity>
         <Text className="text-white font-medium px-2 text-center" numberOfLines={1}>{audio.title}</Text>
       </View>
       <View className="p-2">
-        <Text className="text-xs text-text-secondary">{audio.views} views</Text>
+        <Text className="text-xs text-text-secondary">{audio.viewsCount} views</Text>
       </View>
     </TouchableOpacity>
   );
@@ -82,7 +124,7 @@ export default function MobileHero() {
     loadInitialHero();
   }, []);
 
-  const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+  const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
   const loadInitialHero = async () => {
     setLoading(true);
@@ -94,14 +136,13 @@ export default function MobileHero() {
   };
 
   const loadMoreHero = async () => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore || loading) return;
     setLoadingMore(true);
     const items = await fetchMediaBatch(page, 10);
-    if (items.length === 0) {
-      setHasMore(false);
-    } else {
-      setHeroItems(prev => [...prev, ...shuffle(items)]);
-      setPage(prev => prev + 1);
+    if (items.length === 0) setHasMore(false);
+    else {
+      setHeroItems((prev) => [...prev, ...shuffle(items)]);
+      setPage((prev) => prev + 1);
     }
     setLoadingMore(false);
   };
@@ -115,7 +156,7 @@ export default function MobileHero() {
     setRefreshing(false);
   };
 
-  const filteredItems = activeFilter === 'all' ? heroItems : heroItems.filter(item => item.type === activeFilter);
+  const filteredItems = activeFilter === 'all' ? heroItems : heroItems.filter((item) => item.type === activeFilter);
 
   const renderHeroItem = ({ item }) => {
     const onPress = () => navigation.navigate('MediaDetail', { mediaId: item.id, type: item.type });
@@ -163,13 +204,13 @@ export default function MobileHero() {
                   { key: 'video', label: '🎬 Videos' },
                   { key: 'photo', label: '🖼️ Photos' },
                   { key: 'audio', label: '🎵 Audio' },
-                ].map((filter) => (
+                ].map((f) => (
                   <TouchableOpacity
-                    key={filter.key}
-                    onPress={() => setActiveFilter(filter.key)}
-                    className={`px-5 py-2 rounded-full ${activeFilter === filter.key ? 'bg-primary' : 'bg-surface border border-border'}`}
+                    key={f.key}
+                    onPress={() => setActiveFilter(f.key)}
+                    className={`px-5 py-2 rounded-full ${activeFilter === f.key ? 'bg-primary' : 'bg-surface border border-border'}`}
                   >
-                    <Text className={`font-medium ${activeFilter === filter.key ? 'text-white' : 'text-text'}`}>{filter.label}</Text>
+                    <Text className={`font-medium ${activeFilter === f.key ? 'text-white' : 'text-text'}`}>{f.label}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

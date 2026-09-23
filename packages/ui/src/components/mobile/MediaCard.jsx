@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, Dimensions } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useAudioPlayer } from 'expo-audio';
@@ -22,29 +22,22 @@ const SkeletonCard = () => (
 );
 
 const VideoPlayer = ({ src }) => {
-  const player = useVideoPlayer(src, (player) => {
-    player.loop = true;
-    player.muted = true;
-    player.play();
+  const player = useVideoPlayer(src, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
   });
-
   return <VideoView player={player} style={{ width: '100%', height: '100%' }} contentFit="cover" />;
 };
 
 const AudioPlayer = ({ src, color }) => {
   const player = useAudioPlayer({ uri: src });
   const [isPlaying, setIsPlaying] = useState(false);
-
   const togglePlay = () => {
-    if (isPlaying) {
-      player.pause();
-      setIsPlaying(false);
-    } else {
-      player.play();
-      setIsPlaying(true);
-    }
+    if (isPlaying) player.pause();
+    else player.play();
+    setIsPlaying(!isPlaying);
   };
-
   return (
     <View className="w-full h-full items-center justify-center" style={{ backgroundColor: color }}>
       <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-4">
@@ -66,14 +59,28 @@ export const MobileMediaCardItem = ({ media }) => {
       activeOpacity={0.85}
     >
       <View className="aspect-square">
-        {media.type === 'video' ? <VideoPlayer src={media.src} /> :
-         media.type === 'audio' ? <AudioPlayer src={media.src} color={media.color} /> :
-         <Image source={{ uri: media.src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
+        {media.type === 'video' ? (
+          <VideoPlayer src={media.src} />
+        ) : media.type === 'audio' ? (
+          <AudioPlayer src={media.src} color={media.color} />
+        ) : (
+          <Image source={{ uri: media.src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        )}
       </View>
       <View className="p-3">
+        <View className="flex-row items-center gap-2 mb-2">
+          {media.user?.avatarUrl ? (
+            <Image source={{ uri: media.user.avatarUrl }} style={{ width: 20, height: 20, borderRadius: 10 }} />
+          ) : (
+            <View className="w-5 h-5 rounded-full bg-primary items-center justify-center">
+              <Text className="text-white text-xs font-bold">{(media.user?.name || 'U')[0].toUpperCase()}</Text>
+            </View>
+          )}
+          <Text className="text-xs text-text-secondary flex-1" numberOfLines={1}>{media.user?.name || 'User'}</Text>
+        </View>
         <Text className="text-base font-semibold text-text mb-2" numberOfLines={1}>{media.title}</Text>
         <View className="flex-row justify-between items-center">
-          <Text className="text-xs text-text-secondary">{media.views} views</Text>
+          <Text className="text-xs text-text-secondary">{media.viewsCount} views</Text>
           <View className="flex-row gap-2">
             <Text className="text-lg">🔖</Text>
             <Text className="text-lg text-primary">＋</Text>
@@ -83,7 +90,6 @@ export const MobileMediaCardItem = ({ media }) => {
     </TouchableOpacity>
   );
 };
-
 
 export default function MobileMediaCard({ initialItems = [] }) {
   const [mediaItems, setMediaItems] = useState(initialItems);
@@ -110,8 +116,8 @@ export default function MobileMediaCard({ initialItems = [] }) {
     const newItems = await fetchMediaBatch(page);
     if (newItems.length === 0) setHasMore(false);
     else {
-      setMediaItems(prev => [...prev, ...newItems]);
-      setPage(prev => prev + 1);
+      setMediaItems((prev) => [...prev, ...newItems]);
+      setPage((prev) => prev + 1);
     }
     setLoading(false);
   };

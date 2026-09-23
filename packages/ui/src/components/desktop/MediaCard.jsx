@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { PlayIcon, PauseIcon, BookmarkIcon, PlusIcon } from '../../icons';
 import { fetchMediaBatch } from '../../utils/mockData';
 
-// Skeleton Loader
 const SkeletonCard = () => (
   <div className="rounded-lg overflow-hidden bg-surface shadow-sm">
     <div className="aspect-square bg-border animate-pulse" />
@@ -17,28 +16,22 @@ const SkeletonCard = () => (
   </div>
 );
 
-// Video Player Component (muted, autoplay on hover)
-const VideoPlayer = ({ src }) => {
-  const videoRef = useRef(null);
-  return (
-    <video
-      ref={videoRef}
-      src={src}
-      className="w-full h-full object-cover"
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      onMouseEnter={(e) => e.target.play()}
-      onMouseLeave={(e) => {
-        e.target.pause();
-        e.target.currentTime = 0;
-      }}
-    />
-  );
-};
+const VideoPlayer = ({ src }) => (
+  <video
+    src={src}
+    className="w-full h-full object-cover"
+    muted
+    loop
+    playsInline
+    preload="metadata"
+    onMouseEnter={(e) => e.target.play()}
+    onMouseLeave={(e) => {
+      e.target.pause();
+      e.target.currentTime = 0;
+    }}
+  />
+);
 
-// Audio Player Component
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
@@ -46,36 +39,22 @@ const AudioPlayer = ({ src }) => {
   const togglePlay = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (audioRef.current) {
-      if (isPlaying) audioRef.current.pause();
-      else audioRef.current.play();
-      setIsPlaying(!isPlaying);
-    }
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.pause();
+    else audioRef.current.play();
+    setIsPlaying(!isPlaying);
   };
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-      <button
-        onClick={togglePlay}
-        className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
-      >
-        {isPlaying ? (
-          <PauseIcon className="h-12 w-12 text-white" />
-        ) : (
-          <PlayIcon className="h-12 w-12 text-white" />
-        )}
+      <button onClick={togglePlay} className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition">
+        {isPlaying ? <PauseIcon className="h-12 w-12 text-white" /> : <PlayIcon className="h-12 w-12 text-white" />}
       </button>
       <audio ref={audioRef} src={src} className="hidden" onEnded={() => setIsPlaying(false)} />
     </div>
   );
 };
 
-// Image Display Component
-const ImageDisplay = ({ src, alt }) => (
-  <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" />
-);
-
-// Individual Media Card
 export const DesktopMediaCardItem = ({ media }) => {
   const [isSaved, setIsSaved] = useState(false);
 
@@ -88,11 +67,10 @@ export const DesktopMediaCardItem = ({ media }) => {
           ) : media.type === 'audio' ? (
             <AudioPlayer src={media.src} />
           ) : (
-            <ImageDisplay src={media.src} alt={media.title} />
+            <img src={media.src} alt={media.title} className="w-full h-full object-cover" loading="lazy" />
           )}
         </div>
 
-        {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
           <div className="flex justify-end">
             <button
@@ -105,14 +83,28 @@ export const DesktopMediaCardItem = ({ media }) => {
               <BookmarkIcon className="h-5 w-5" />
             </button>
           </div>
-          <div className="flex justify-between items-center">
-            <div>
+          <div className="flex justify-between items-end">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                {media.user?.avatarUrl ? (
+  <img src={media.user.avatarUrl} alt={media.user.name || 'User'} className="w-6 h-6 rounded-full object-cover" />
+) : (
+  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+    {(media.user?.name || media.user?.email || 'U')[0].toUpperCase()}
+  </div>
+)}
+<span className="text-white text-xs truncate">
+  {media.user?.name || media.user?.email?.split('@')[0] || 'User'}
+</span>
+              </div>
               <span className="text-white text-sm font-medium truncate block">{media.title}</span>
-              <span className="text-white/70 text-xs">{media.views} views • {media.likes} likes</span>
+              <span className="text-white/70 text-xs">
+                {media.viewsCount} views · {media.likesCount} likes
+              </span>
             </div>
             <button
               onClick={(e) => e.preventDefault()}
-              className="rounded-full bg-primary p-2 text-white hover:bg-primary-dark"
+              className="rounded-full bg-primary p-2 text-white hover:bg-primary-dark ml-2"
             >
               <PlusIcon className="h-5 w-5" />
             </button>
@@ -123,7 +115,6 @@ export const DesktopMediaCardItem = ({ media }) => {
   );
 };
 
-// Grid Component with Infinite Scroll
 export default function DesktopMediaCardGrid() {
   const [mediaItems, setMediaItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,9 +122,7 @@ export default function DesktopMediaCardGrid() {
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef(null);
 
-  const loadItems = useCallback(async (pageNum) => {
-    return await fetchMediaBatch(pageNum, 12);
-  }, []);
+  const loadItems = useCallback(async (pageNum) => await fetchMediaBatch(pageNum, 12), []);
 
   useEffect(() => {
     const initialLoad = async () => {
@@ -148,11 +137,10 @@ export default function DesktopMediaCardGrid() {
   const loadMore = useCallback(async () => {
     if (!hasMore) return;
     const items = await loadItems(page);
-    if (items.length === 0) {
-      setHasMore(false);
-    } else {
-      setMediaItems(prev => [...prev, ...items]);
-      setPage(prev => prev + 1);
+    if (items.length === 0) setHasMore(false);
+    else {
+      setMediaItems((prev) => [...prev, ...items]);
+      setPage((prev) => prev + 1);
     }
   }, [page, hasMore, loadItems]);
 

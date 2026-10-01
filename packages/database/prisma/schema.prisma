@@ -17,7 +17,6 @@ model User {
   bio           String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
   media         Media[]
   likes         Like[]
   favorites     Favorite[]
@@ -51,7 +50,6 @@ model Media {
   commentsCount     Int       @default(0)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-
   likes             Like[]
   favorites         Favorite[]
   comments          Comment[]
@@ -65,7 +63,6 @@ model Like {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-
   @@unique([userId, mediaId])
 }
 
@@ -76,7 +73,6 @@ model Favorite {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-
   @@unique([userId, mediaId])
 }
 
@@ -85,10 +81,8 @@ model Follow {
   followerId  String   // the user who follows
   followingId String   // the user being followed
   createdAt   DateTime @default(now())
-
   follower    User     @relation("Follower",  fields: [followerId],  references: [id], onDelete: Cascade)
   following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-
   @@unique([followerId, followingId])
 }
 
@@ -107,10 +101,8 @@ model View {
   userId    String
   mediaId   String
   createdAt DateTime @default(now())
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-
   @@unique([userId, mediaId])
   @@index([mediaId])
 }

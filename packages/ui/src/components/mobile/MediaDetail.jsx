@@ -209,7 +209,7 @@ export default function MobileMediaDetail() {
 const shareMedia = async () => {
   try {
     await Share.share({
-      message: `${media.title}\n${media.description || ''}\n\nCheck it out on PinShare: http://localhost:3000/media/${media.id}`,
+      message: `${media.title}\n${media.description || ''}\n\nCheck it out on AR Media: http://localhost:3000/media/${media.id}`,
     });
   } catch (e) {
     console.error(e);

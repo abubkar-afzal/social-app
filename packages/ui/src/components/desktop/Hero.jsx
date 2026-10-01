@@ -47,11 +47,9 @@ const PhotoCard = ({ photo }) => (
   <Link to={`/media/${photo.id}`}>
     <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
       <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" loading="lazy" />
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+      <div className="absolute inset-0 opacity-100 transition-opacity flex flex-col justify-between p-3">
         <div className="flex justify-end">
-          <button className="rounded-full bg-white/90 p-2 hover:bg-white">
-            <BookmarkIcon className="h-5 w-5" />
-          </button>
+
         </div>
         <div>
           <div className="flex items-center gap-2 mb-1">

@@ -215,7 +215,7 @@ export default function MediaDetail({ mediaId }) {
     const url = typeof window !== 'undefined' ? window.location.href : '';
     const shareData = {
       title: media.title,
-      text: media.description || 'Check out this post on PinShare!',
+      text: media.description || 'Check out this post on AR Media!',
       url,
     };
     try {

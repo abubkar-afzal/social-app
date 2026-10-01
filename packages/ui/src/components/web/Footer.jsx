@@ -17,6 +17,11 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">About</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
+              <li>
+  <Link href="/favorites" className="hover:text-primary transition">
+    Favorites
+  </Link>
+</li>
               <li><Link href="/about" className="hover:text-primary transition">Our Story</Link></li>
               <li><Link href="/careers" className="hover:text-primary transition">Careers</Link></li>
               <li><Link href="/press" className="hover:text-primary transition">Press</Link></li>
@@ -40,7 +45,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-text-secondary">© {new Date().getFullYear()} PinShare. All rights reserved.</p>
+          <p className="text-sm text-text-secondary">© {new Date().getFullYear()} AR Media. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="text-text-secondary hover:text-primary transition">Twitter</a>
             <a href="#" className="text-text-secondary hover:text-primary transition">Instagram</a>

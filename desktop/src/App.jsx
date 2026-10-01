@@ -15,6 +15,8 @@ import PressPage from '../../packages/ui/src/components/desktop/PressPage';
 import BlogPage from '../../packages/ui/src/components/desktop/BlogPage';
 import HelpPage from '../../packages/ui/src/components/desktop/HelpPage';
 import GuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
+import DesktopFavoritesGrid from '../../packages/ui/src/components/desktop/FavoritesGrid';
+
 import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
 
 setApiBaseUrl('http://localhost:3000'); // Replace with your actual API base URL
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="/login" element={<DesktopLogin />} />
             <Route path="/account" element={<DesktopAccount />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/favorites" element={<DesktopFavoritesGrid />} />
+
 <Route path="/careers" element={<CareersPage />} />
 <Route path="/press" element={<PressPage />} />
 <Route path="/blog" element={<BlogPage />} />

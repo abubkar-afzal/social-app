@@ -17,6 +17,11 @@ export default function DesktopFooter() {
           <div>
             <h3 className="text-sm font-semibold text-text mb-4">About</h3>
             <ul className="space-y-2 text-sm text-text-secondary">
+              <li>
+  <Link to="/favorites" className="hover:text-primary transition">
+    Favorites
+  </Link>
+</li>
               <li><Link to="/about" className="hover:text-primary transition">Our Story</Link></li>
               <li><Link to="/careers" className="hover:text-primary transition">Careers</Link></li>
               <li><Link to="/press" className="hover:text-primary transition">Press</Link></li>
@@ -40,7 +45,7 @@ export default function DesktopFooter() {
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border text-center text-sm text-text-secondary">
-          © {new Date().getFullYear()} PinShare. All rights reserved.
+          © {new Date().getFullYear()} AR Media. All rights reserved.
         </div>
       </div>
     </footer>

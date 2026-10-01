@@ -62,8 +62,8 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-2xl font-bold text-primary">P</span>
-            <span className="hidden sm:inline text-xl font-semibold text-text">PinShare</span>
+            <span className="text-2xl font-bold text-primary"></span>
+            <span className="hidden sm:inline text-xl font-semibold text-text">AR Media</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -139,13 +139,10 @@ export default function Navbar() {
                   <PlusIcon className="h-5 w-5" />
                   Create
                 </Link>
-                <Link href="/account" className="rounded-full p-2 text-text-secondary hover:bg-background">
-                  <BookmarkIcon className="h-6 w-6" />
-                </Link>
-                <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
-                  <BellIcon className="h-6 w-6" />
-                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
-                </button>
+                <Link href="/favorites" className="rounded-full p-2 text-text-secondary hover:bg-background">
+  <BookmarkIcon className="h-5 w-5" />
+</Link>
+                
 
                 {/* User Dropdown */}
                 <div className="relative" ref={userRef}>

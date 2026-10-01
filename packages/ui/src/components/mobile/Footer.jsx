@@ -21,6 +21,8 @@ export default function MobileFooter({ state, descriptors, navigation }) {
     { key: 'Photos', label: 'Photos', icon: '🖼️', screen: 'Photos' },
     { key: 'Audio', label: 'Audio', icon: '🎵', screen: 'Audio' },
     { key: 'Login', label: 'Login', icon: '👤', screen: 'Login' },
+    { label: 'Favorites',label: 'Favorites', icon: '⭐',screen: 'Favorites' },
+
   ];
 
   const handleTabPress = (screen) => {

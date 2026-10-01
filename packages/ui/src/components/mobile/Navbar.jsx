@@ -63,7 +63,7 @@ export default function MobileNavbar() {
         <TouchableOpacity onPress={() => navigation.navigate('Home')} className="p-2">
           <Text className="text-2xl">🏠</Text>
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-primary">PinShare</Text>
+        <Text className="text-xl font-bold text-primary">AR Media</Text>
         <TouchableOpacity onPress={handleProfilePress} className="p-2">
           {user?.avatarUrl ? (
             <Image

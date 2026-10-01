@@ -213,7 +213,7 @@ export default function DesktopMediaDetail() {
       if (navigator.share) {
         await navigator.share({
           title: media.title,
-          text: media.description || 'Check out this post on PinShare!',
+          text: media.description || 'Check out this post on AR Media!',
           url,
         });
       } else if (navigator.clipboard) {

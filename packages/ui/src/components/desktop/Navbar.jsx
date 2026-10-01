@@ -61,8 +61,8 @@ export default function DesktopNavbar() {
       <div className="flex h-16 items-center justify-between px-6 gap-4">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-2xl font-bold text-primary">P</span>
-          <span className="text-lg font-semibold text-text">PinShare</span>
+          <span className="text-2xl font-bold text-primary"></span>
+          <span className="text-lg font-semibold text-text">AR Media</span>
         </Link>
 
         {/* Navigation */}
@@ -130,13 +130,10 @@ export default function DesktopNavbar() {
               >
                 <PlusIcon className="h-5 w-5" />
               </Link>
-              <button className="rounded-full p-2 text-text-secondary hover:bg-background relative">
-                <BellIcon className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
-              </button>
-              <Link to="/account" className="rounded-full p-2 text-text-secondary hover:bg-background">
-                <BookmarkIcon className="h-5 w-5" />
-              </Link>
+              
+              <Link to="/favorites" className="rounded-full p-2 text-text-secondary hover:bg-background">
+  <BookmarkIcon className="h-6 w-6" />
+</Link>
 
               {/* User Dropdown */}
               <div className="relative" ref={userRef}>

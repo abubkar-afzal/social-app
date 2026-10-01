@@ -26,6 +26,7 @@ import BlogScreen from '../../packages/ui/src/components/mobile/BlogScreen';
 import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
 import UploadMediaScreen from '../../packages/ui/src/components/mobile/UploadMediaScreen';
+import FavoritesScreen from '../../packages/ui/src/components/mobile/FavoritesScreen';
 
 
 const Stack = createStackNavigator();
@@ -130,6 +131,8 @@ export default function App() {
         <Stack.Screen name="Login" component={MobileLogin} />
         <Stack.Screen name="UploadMedia" component={UploadMediaScreen} />
         <Stack.Screen name="About">
+          <Stack.Screen name="Favorites" component={FavoritesScreen} />
+
           {() => (
             <ExtraPageWrapper>
               <AboutScreen />

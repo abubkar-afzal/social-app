@@ -10,7 +10,7 @@ export default function DesktopPrivacyPage() {
         <section>
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">1. Introduction</h2>
           <p>
-            Welcome to PinShare ("we", "our", "us"). We respect your privacy and are committed to
+            Welcome to armedia ("we", "our", "us"). We respect your privacy and are committed to
             protecting your personal data. This Privacy Policy explains how we collect, use,
             disclose, and safeguard your information when you use our platform.
           </p>
@@ -41,7 +41,7 @@ export default function DesktopPrivacyPage() {
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">4. Media Storage</h2>
           <p>
             Media files you upload are stored on a shared Google Drive account owned and operated
-            by PinShare. Files are made publicly readable. Only metadata (titles, descriptions,
+            by armedia. Files are made publicly readable. Only metadata (titles, descriptions,
             uploader info) is stored on our servers. You retain ownership of your content.
           </p>
         </section>
@@ -84,8 +84,8 @@ export default function DesktopPrivacyPage() {
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">10. Contact Us</h2>
           <p>
             For questions, contact:
-            <a href="mailto:privacy@pinshare.com" className="text-primary hover:underline ml-1">
-              privacy@pinshare.com
+            <a href="mailto:privacy@armedia.com" className="text-primary hover:underline ml-1">
+              privacy@armedia.com
             </a>
           </p>
         </section>

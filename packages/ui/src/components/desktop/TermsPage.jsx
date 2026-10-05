@@ -10,7 +10,7 @@ export default function DesktopTermsPage() {
         <section>
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">1. Acceptance of Terms</h2>
           <p>
-            By accessing or using PinShare, you agree to be bound by these Terms. If you do not
+            By accessing or using armedia, you agree to be bound by these Terms. If you do not
             agree, you must not use the Platform.
           </p>
         </section>
@@ -32,7 +32,7 @@ export default function DesktopTermsPage() {
         <section>
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">4. User Content</h2>
           <p>
-            You retain ownership of all content you upload. By uploading, you grant PinShare a
+            You retain ownership of all content you upload. By uploading, you grant armedia a
             worldwide, non-exclusive, royalty-free license to store, display, and distribute your
             content on the Platform.
           </p>
@@ -84,7 +84,7 @@ export default function DesktopTermsPage() {
         <section>
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">9. Limitation of Liability</h2>
           <p>
-            To the maximum extent permitted by law, PinShare shall not be liable for any indirect,
+            To the maximum extent permitted by law, armedia shall not be liable for any indirect,
             incidental, or consequential damages.
           </p>
         </section>
@@ -98,8 +98,8 @@ export default function DesktopTermsPage() {
           <h2 className="text-2xl font-semibold text-text mt-8 mb-3">11. Contact</h2>
           <p>
             Questions? Contact:
-            <a href="mailto:legal@pinshare.com" className="text-primary hover:underline ml-1">
-              legal@pinshare.com
+            <a href="mailto:legal@armedia.com" className="text-primary hover:underline ml-1">
+              legal@armedia.com
             </a>
           </p>
         </section>

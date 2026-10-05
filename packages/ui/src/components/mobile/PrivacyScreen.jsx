@@ -19,7 +19,7 @@ export default function PrivacyScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">1. Introduction</Text>
             <Text className="text-text-secondary leading-6">
-              Welcome to PinShare. We respect your privacy and are committed to protecting your
+              Welcome to armedia. We respect your privacy and are committed to protecting your
               personal data. This Privacy Policy explains how we collect, use, disclose, and
               safeguard your information when you use our platform.
             </Text>
@@ -100,7 +100,7 @@ export default function PrivacyScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">10. Contact Us</Text>
             <Text className="text-text-secondary leading-6">
-              For questions about this Privacy Policy, contact us at privacy@pinshare.com
+              For questions about this Privacy Policy, contact us at privacy@armedia.com
             </Text>
           </View>
         </View>

@@ -14,7 +14,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using PinShare ("the Platform"), you agree to be bound by these Terms
+              By accessing or using armedia ("the Platform"), you agree to be bound by these Terms
               of Service. If you do not agree with any part of these terms, you must not use the
               Platform.
             </p>
@@ -23,7 +23,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">2. Eligibility</h2>
             <p>
-              You must be at least 13 years old to use the Platform. By using PinShare, you
+              You must be at least 13 years old to use the Platform. By using armedia, you
               represent that you meet this requirement and have the legal capacity to enter into
               these Terms.
             </p>
@@ -43,7 +43,7 @@ export default function TermsOfService() {
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">4. User Content</h2>
             <p>
               You retain ownership of all content you upload ("User Content"). By uploading content,
-              you grant PinShare a worldwide, non-exclusive, royalty-free license to store, display,
+              you grant armedia a worldwide, non-exclusive, royalty-free license to store, display,
               and distribute your content on the Platform.
             </p>
             <p className="mt-3">You agree NOT to upload content that:</p>
@@ -69,8 +69,8 @@ export default function TermsOfService() {
             <p>
               We respect copyright. If you believe your work has been copied in a way that
               constitutes copyright infringement, contact us at
-              <a href="mailto:copyright@pinshare.com" className="text-primary hover:underline ml-1">
-                copyright@pinshare.com
+              <a href="mailto:copyright@armedia.com" className="text-primary hover:underline ml-1">
+                copyright@armedia.com
               </a>.
             </p>
           </section>
@@ -106,7 +106,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">10. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, PinShare shall not be liable for any
+              To the maximum extent permitted by law, armedia shall not be liable for any
               indirect, incidental, special, or consequential damages arising from your use of
               the Platform.
             </p>
@@ -133,8 +133,8 @@ export default function TermsOfService() {
             <p>
               Questions about these Terms? Contact us at:
               <br />
-              <a href="mailto:legal@pinshare.com" className="text-primary hover:underline">
-                legal@pinshare.com
+              <a href="mailto:legal@armedia.com" className="text-primary hover:underline">
+                legal@armedia.com
               </a>
             </p>
           </section>

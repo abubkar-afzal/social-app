@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">1. Introduction</h2>
             <p>
-              Welcome to PinShare ("we", "our", "us"). We respect your privacy and are committed to
+              Welcome to armedia ("we", "our", "us"). We respect your privacy and are committed to
               protecting your personal data. This Privacy Policy explains how we collect, use,
               disclose, and safeguard your information when you use our platform.
             </p>
@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-semibold text-text mt-8 mb-3">4. Media Storage</h2>
             <p>
               Media files you upload are stored on a shared Google Drive account owned and
-              operated by PinShare. Files are made publicly readable so they can be viewed by
+              operated by armedia. Files are made publicly readable so they can be viewed by
               other users. Only metadata (titles, descriptions, uploader info) is stored on our
               servers. You retain ownership of your content.
             </p>
@@ -104,8 +104,8 @@ export default function PrivacyPolicy() {
             <p>
               For questions about this Privacy Policy, contact us at:
               <br />
-              <a href="mailto:privacy@pinshare.com" className="text-primary hover:underline">
-                privacy@pinshare.com
+              <a href="mailto:privacy@armedia.com" className="text-primary hover:underline">
+                privacy@armedia.com
               </a>
             </p>
           </section>

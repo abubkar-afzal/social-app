@@ -19,7 +19,7 @@ export default function TermsScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">1. Acceptance of Terms</Text>
             <Text className="text-text-secondary leading-6">
-              By accessing or using PinShare, you agree to be bound by these Terms. If you do not
+              By accessing or using armedia, you agree to be bound by these Terms. If you do not
               agree, you must not use the Platform.
             </Text>
           </View>
@@ -43,7 +43,7 @@ export default function TermsScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">4. User Content</Text>
             <Text className="text-text-secondary leading-6">
-              You retain ownership of all content you upload. By uploading, you grant PinShare a
+              You retain ownership of all content you upload. By uploading, you grant armedia a
               worldwide, non-exclusive, royalty-free license to store, display, and distribute your
               content on the Platform.{'\n\n'}
               You agree NOT to upload content that infringes copyright, contains hate speech,
@@ -90,7 +90,7 @@ export default function TermsScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">9. Limitation of Liability</Text>
             <Text className="text-text-secondary leading-6">
-              To the maximum extent permitted by law, PinShare shall not be liable for any indirect,
+              To the maximum extent permitted by law, armedia shall not be liable for any indirect,
               incidental, or consequential damages.
             </Text>
           </View>
@@ -105,7 +105,7 @@ export default function TermsScreen() {
           <View>
             <Text className="text-xl font-semibold text-text mb-2">11. Contact</Text>
             <Text className="text-text-secondary leading-6">
-              Questions? Contact us at legal@pinshare.com
+              Questions? Contact us at legal@armedia.com
             </Text>
           </View>
         </View>

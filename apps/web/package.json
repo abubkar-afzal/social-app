@@ -16,7 +16,13 @@
     "postcss": "^8.5.26",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-easy-crop": "^6.2.3"
+    "react-easy-crop": "^6.2.3",
+    "formidable": "^3.5.4",
+    "googleapis": "^176.0.0",
+    "@heroicons/react": "^2.0.18",
+    "@prisma/client": "^6.19.0",
+    "dotenv": "^17.4.2",
+    "prisma": "^6.19.0"
   },
   "devDependencies": {
     "eslint": "^9",

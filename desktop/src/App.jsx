@@ -16,6 +16,8 @@ import BlogPage from '../../packages/ui/src/components/desktop/BlogPage';
 import HelpPage from '../../packages/ui/src/components/desktop/HelpPage';
 import GuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
 import DesktopFavoritesGrid from '../../packages/ui/src/components/desktop/FavoritesGrid';
+import DesktopPrivacyPage from '../../packages/ui/src/components/desktop/PrivacyPage';
+import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage';
 
 import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
 
@@ -44,6 +46,8 @@ export default function App() {
 <Route path="/help" element={<HelpPage />} />
 <Route path="/guidelines" element={<GuidelinesPage />} />
 <Route path="/uploadmedia" element={<DesktopUploadMedia />} />
+<Route path="/privacy" element={<DesktopPrivacyPage />} />
+<Route path="/terms" element={<DesktopTermsPage />} />
           </Routes>
         </main>
         <DesktopFooter />

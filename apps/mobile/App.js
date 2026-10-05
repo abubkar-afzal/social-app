@@ -27,7 +27,8 @@ import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
 import UploadMediaScreen from '../../packages/ui/src/components/mobile/UploadMediaScreen';
 import FavoritesScreen from '../../packages/ui/src/components/mobile/FavoritesScreen';
-
+import PrivacyScreen from '../../packages/ui/src/components/mobile/PrivacyScreen';
+import TermsScreen from '../../packages/ui/src/components/mobile/TermsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -132,7 +133,8 @@ export default function App() {
         <Stack.Screen name="UploadMedia" component={UploadMediaScreen} />
         <Stack.Screen name="About">
           <Stack.Screen name="Favorites" component={FavoritesScreen} />
-
+<Stack.Screen name="Privacy" component={PrivacyScreen} />
+<Stack.Screen name="Terms" component={TermsScreen} />
           {() => (
             <ExtraPageWrapper>
               <AboutScreen />

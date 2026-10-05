@@ -28,13 +28,15 @@ export default function MobileNavbar() {
   ];
 
   const moreLinks = [
-    { label: 'About', screen: 'About' },
-    { label: 'Careers', screen: 'Careers' },
-    { label: 'Press', screen: 'Press' },
-    { label: 'Blog', screen: 'Blog' },
-    { label: 'Help Center', screen: 'Help' },
-    { label: 'Guidelines', screen: 'Guidelines' },
-  ];
+  { label: 'About', href: '/about' },
+  { label: 'Careers', href: '/careers' },
+  { label: 'Press', href: '/press' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Help Center', href: '/help' },
+  { label: 'Guidelines', href: '/guidelines' },
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/terms' },
+];
 
   const handleTabPress = (screen) => {
     const tabScreens = tabs.map((t) => t.screen);

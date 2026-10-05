@@ -1,11 +1,9 @@
 import React from 'react';
-import Navbar from '../../../packages/ui/src/components/web/Navbar';
-import Footer from '../../../packages/ui/src/components/web/Footer';
 
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+
       <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
         <h1 className="text-4xl font-bold text-text mb-2">Privacy Policy</h1>
         <p className="text-text-secondary mb-8">Last updated: October 5, 2026</p>
@@ -111,7 +109,7 @@ export default function PrivacyPolicy() {
           </section>
         </div>
       </main>
-      <Footer />
+  
     </div>
   );
 }

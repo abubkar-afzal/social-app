@@ -2,27 +2,31 @@
   "expo": {
     "name": "AR Media",
     "slug": "ar-media",
+    "scheme": "com.armedia.app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/my_logo.jpg",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/my_logo.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.armedia"
+      "bundleIdentifier": "com.armedia.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/my_logo.jpg",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.armedia",
+      "package": "com.armedia.app",
       "usesCleartextTraffic": true,
       "permissions": [
         "android.permission.RECORD_AUDIO",
@@ -32,12 +36,14 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/my_logo.jpg"
     },
     "plugins": [
       "expo-status-bar",
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      "expo-dev-client",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

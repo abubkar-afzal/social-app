@@ -21,7 +21,7 @@ import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage
 
 import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
 
-setApiBaseUrl('http://localhost:3000'); // Replace with your actual API base URL
+setApiBaseUrl('https://ar-media-sigma.vercel.app'); // Replace with your actual API base URL
 
 export default function App() {
   return (

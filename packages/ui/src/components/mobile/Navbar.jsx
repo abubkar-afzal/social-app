@@ -27,16 +27,16 @@ export default function MobileNavbar() {
     { label: 'Account', icon: '👤', screen: 'Account' },
   ];
 
-  const moreLinks = [
-  { label: 'About', href: '/about' },
-  { label: 'Careers', href: '/careers' },
-  { label: 'Press', href: '/press' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Help Center', href: '/help' },
-  { label: 'Guidelines', href: '/guidelines' },
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms of Service', href: '/terms' },
-];
+//   const moreLinks = [
+//   { label: 'About', href: '/about' },
+//   { label: 'Careers', href: '/careers' },
+//   { label: 'Press', href: '/press' },
+//   { label: 'Blog', href: '/blog' },
+//   { label: 'Help Center', href: '/help' },
+//   { label: 'Guidelines', href: '/guidelines' },
+//   { label: 'Privacy Policy', href: '/privacy' },
+//   { label: 'Terms of Service', href: '/terms' },
+// ];
 
   const handleTabPress = (screen) => {
     const tabScreens = tabs.map((t) => t.screen);
@@ -91,7 +91,7 @@ export default function MobileNavbar() {
       </View>
 
       {/* Navigation tabs */}
-      <View className="flex-row justify-around items-center">
+      {/* <View className="flex-row justify-around items-center">
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab.screen}
@@ -102,10 +102,10 @@ export default function MobileNavbar() {
             <Text className="text-xs text-text-secondary">{tab.label}</Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </View> */}
 
       {/* More Modal */}
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={moreVisible}
@@ -139,7 +139,7 @@ export default function MobileNavbar() {
             </ScrollView>
           </View>
         </TouchableOpacity>
-      </Modal>
+      </Modal> */}
     </View>
   );
 }

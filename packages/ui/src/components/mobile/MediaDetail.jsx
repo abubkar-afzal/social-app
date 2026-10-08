@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator,
-  FlatList, TextInput, Alert,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  FlatList,
+  TextInput,
+  Alert,
+  Linking,
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useAudioPlayer } from 'expo-audio';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store';
 import { fetchMediaById, fetchSuggestions } from '../../utils/mockData';
 import { apiUrl } from '../../utils/apiConfig';
+import { storage } from '../../utils/storage';
 import { useMobileAuth } from './useMobileAuth';
-import { Share } from 'react-native';
-const getUserDisplayName = (user) => {
-  if (!user) return 'Unknown';
-  return user.name || user.email?.split('@')[0] || 'User';
-};
-const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
 
+/* -------------------------------------------------------------------------- */
+/*                                Video Player                                 */
+/* -------------------------------------------------------------------------- */
 
 const VideoPlayer = ({ src }) => {
   const player = useVideoPlayer(src, (p) => {
@@ -24,17 +29,30 @@ const VideoPlayer = ({ src }) => {
     p.muted = false;
     p.play();
   });
-  return <VideoView player={player} style={{ width: '100%', aspectRatio: 16 / 9 }} contentFit="contain" nativeControls />;
+  return (
+    <VideoView
+      player={player}
+      style={{ width: '100%', aspectRatio: 16 / 9 }}
+      contentFit="contain"
+      nativeControls
+    />
+  );
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                Audio Player                                 */
+/* -------------------------------------------------------------------------- */
 
 const AudioPlayer = ({ src }) => {
   const player = useAudioPlayer({ uri: src });
   const [isPlaying, setIsPlaying] = useState(false);
+
   const toggle = () => {
     if (isPlaying) player.pause();
     else player.play();
     setIsPlaying(!isPlaying);
   };
+
   return (
     <View className="aspect-square bg-gradient-to-br from-primary-light to-primary-dark items-center justify-center">
       <TouchableOpacity onPress={toggle} className="rounded-full bg-white/20 p-6">
@@ -43,6 +61,10 @@ const AudioPlayer = ({ src }) => {
     </View>
   );
 };
+
+/* -------------------------------------------------------------------------- */
+/*                             Suggestion Card                                 */
+/* -------------------------------------------------------------------------- */
 
 const SuggestionCard = ({ item, navigation }) => (
   <TouchableOpacity
@@ -59,11 +81,47 @@ const SuggestionCard = ({ item, navigation }) => (
       </View>
     )}
     <View className="p-2">
-      <Text className="text-xs font-semibold text-text" numberOfLines={1}>{item.title}</Text>
+      <Text className="text-xs font-semibold text-text" numberOfLines={1}>
+        {item.title}
+      </Text>
       <Text className="text-xs text-text-secondary">{item.viewsCount} views</Text>
     </View>
   </TouchableOpacity>
 );
+
+/* -------------------------------------------------------------------------- */
+/*                                 Helpers                                     */
+/* -------------------------------------------------------------------------- */
+
+const getUserDisplayName = (user) => {
+  if (!user) return 'Unknown';
+  return user.name || user.email?.split('@')[0] || 'User';
+};
+
+const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
+
+const getFileExtension = (mimeType) => {
+  if (!mimeType) return '';
+  const map = {
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp',
+    'video/mp4': '.mp4',
+    'video/webm': '.webm',
+    'video/quicktime': '.mov',
+    'audio/mpeg': '.mp3',
+    'audio/mp3': '.mp3',
+    'audio/wav': '.wav',
+    'audio/ogg': '.ogg',
+  };
+  return map[mimeType] || '';
+};
+
+/* -------------------------------------------------------------------------- */
+/*                              Main Component                                 */
+/* -------------------------------------------------------------------------- */
 
 export default function MobileMediaDetail() {
   const navigation = useNavigation();
@@ -81,6 +139,7 @@ export default function MobileMediaDetail() {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [following, setFollowing] = useState(false);
   const [isOwnPost, setIsOwnPost] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
@@ -92,38 +151,43 @@ export default function MobileMediaDetail() {
 
   const loadMedia = async () => {
     setLoading(true);
-    const item = await fetchMediaById(mediaId);
-    setMedia(item);
-    setLikesCount(item.likesCount || 0);
-    setFavoritesCount(item.favoritesCount || 0);
-    setLiked(item.liked || false);
-    setFavorited(item.favorited || false);
-    setFollowing(item.following || false);
-    setIsOwnPost(item.isOwnPost || false);
-
-    // Record view (only if signed in)
     try {
-      const token = await SecureStore.getItemAsync('authToken');
-      if (token) {
-        fetch(apiUrl(`/api/media/${mediaId}/view`), {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-        }).catch(() => {});
-      }
-    } catch {}
+      const item = await fetchMediaById(mediaId);
+      setMedia(item);
+      setLikesCount(item.likesCount || 0);
+      setFavoritesCount(item.favoritesCount || 0);
+      setLiked(item.liked || false);
+      setFavorited(item.favorited || false);
+      setFollowing(item.following || false);
+      setIsOwnPost(item.isOwnPost || false);
 
-    try {
-      const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
-      if (res.ok) {
-        const data = await res.json();
-        setComments(data.comments || []);
+      // Record unique view
+      try {
+        const token = await storage.getItem('authToken');
+        if (token) {
+          fetch(apiUrl(`/api/media/${mediaId}/view`), {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => {});
+        }
+      } catch {}
+
+      // Load comments
+      try {
+        const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
+        if (res.ok) {
+          const data = await res.json();
+          setComments(data.comments || []);
+        }
+      } catch (e) {
+        console.error(e);
       }
+
+      const sugg = await fetchSuggestions(item.type, mediaId);
+      setSuggestions(sugg);
     } catch (e) {
-      console.error(e);
+      console.error('Failed to load media:', e);
     }
-
-    const sugg = await fetchSuggestions(item.type, mediaId);
-    setSuggestions(sugg);
     setLoading(false);
   };
 
@@ -144,7 +208,7 @@ export default function MobileMediaDetail() {
     setLiked(next);
     setLikesCount((c) => c + (next ? 1 : -1));
     try {
-      const token = await SecureStore.getItemAsync('authToken');
+      const token = await storage.getItem('authToken');
       await fetch(apiUrl(`/api/media/${mediaId}/like`), {
         method: next ? 'POST' : 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -160,7 +224,7 @@ export default function MobileMediaDetail() {
     setFavorited(next);
     setFavoritesCount((c) => c + (next ? 1 : -1));
     try {
-      const token = await SecureStore.getItemAsync('authToken');
+      const token = await storage.getItem('authToken');
       await fetch(apiUrl(`/api/media/${mediaId}/favorite`), {
         method: next ? 'POST' : 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -175,7 +239,7 @@ export default function MobileMediaDetail() {
     const next = !following;
     setFollowing(next);
     try {
-      const token = await SecureStore.getItemAsync('authToken');
+      const token = await storage.getItem('authToken');
       await fetch(apiUrl(`/api/user/${media.userId}/follow`), {
         method: next ? 'POST' : 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -185,12 +249,34 @@ export default function MobileMediaDetail() {
     }
   };
 
+  /* ----------------------------- Download ----------------------------- */
+  const downloadMedia = async () => {
+    if (!media) return;
+    setDownloading(true);
+    try {
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${media.googleDriveFileId}`;
+
+      const supported = await Linking.canOpenURL(downloadUrl);
+      if (!supported) {
+        Alert.alert('Error', 'Cannot open download link on this device.');
+        setDownloading(false);
+        return;
+      }
+
+      await Linking.openURL(downloadUrl);
+    } catch (e) {
+      console.error('Download error:', e);
+      Alert.alert('Error', 'Download failed. Try again.');
+    }
+    setDownloading(false);
+  };
+
   const submitComment = async () => {
     if (!requireAuth()) return;
     if (!commentText.trim()) return;
     setPostingComment(true);
     try {
-      const token = await SecureStore.getItemAsync('authToken');
+      const token = await storage.getItem('authToken');
       const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -206,15 +292,6 @@ export default function MobileMediaDetail() {
     }
     setPostingComment(false);
   };
-const shareMedia = async () => {
-  try {
-    await Share.share({
-      message: `${media.title}\n${media.description || ''}\n\nCheck it out on AR Media: http://localhost:3000/media/${media.id}`,
-    });
-  } catch (e) {
-    console.error(e);
-  }
-};
 
   const deleteComment = (commentId) => {
     if (!requireAuth()) return;
@@ -224,13 +301,20 @@ const shareMedia = async () => {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-          const token = await SecureStore.getItemAsync('authToken');
-          const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`), {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ commentId }),
-          });
-          if (res.ok) setComments((prev) => prev.filter((c) => c.id !== commentId));
+          try {
+            const token = await storage.getItem('authToken');
+            const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`), {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ commentId }),
+            });
+            if (res.ok) setComments((prev) => prev.filter((c) => c.id !== commentId));
+          } catch (e) {
+            console.error(e);
+          }
         },
       },
     ]);
@@ -250,6 +334,7 @@ const shareMedia = async () => {
         <Text className="text-primary text-lg">← Back</Text>
       </TouchableOpacity>
 
+      {/* MEDIA */}
       <View className="bg-surface rounded-b-xl overflow-hidden">
         {media.type === 'video' && <VideoPlayer src={media.src} />}
         {media.type === 'photo' && (
@@ -260,73 +345,97 @@ const shareMedia = async () => {
 
       <View className="p-4">
         <Text className="text-2xl font-bold text-text">{media.title}</Text>
-        {media.description ? <Text className="text-text-secondary mt-1">{media.description}</Text> : null}
+        {media.description ? (
+          <Text className="text-text-secondary mt-1">{media.description}</Text>
+        ) : null}
 
+        {/* ACTION BAR */}
         <View className="flex-row flex-wrap gap-3 mt-4">
-  <TouchableOpacity
-    onPress={toggleLike}
-    className={`flex-row items-center gap-2 px-4 py-2 rounded-full border ${liked ? 'bg-primary border-primary' : 'bg-surface border-border'}`}
-  >
-    <Text>{liked ? '❤️' : '🤍'}</Text>
-    <Text className={liked ? 'text-white font-medium' : 'text-text'}>{likesCount}</Text>
-  </TouchableOpacity>
+          <TouchableOpacity
+            onPress={toggleLike}
+            className={`flex-row items-center gap-2 px-4 py-2 rounded-full border ${
+              liked ? 'bg-primary border-primary' : 'bg-surface border-border'
+            }`}
+          >
+            <Text>{liked ? '❤️' : '🤍'}</Text>
+            <Text className={liked ? 'text-white font-medium' : 'text-text'}>
+              {likesCount}
+            </Text>
+          </TouchableOpacity>
 
-  <TouchableOpacity
-    onPress={toggleFavorite}
-    className={`flex-row items-center gap-2 px-4 py-2 rounded-full border ${favorited ? 'bg-primary border-primary' : 'bg-surface border-border'}`}
-  >
-    <Text>{favorited ? '⭐' : '☆'}</Text>
-    <Text className={favorited ? 'text-white font-medium' : 'text-text'}>{favoritesCount}</Text>
-  </TouchableOpacity>
+          <TouchableOpacity
+            onPress={toggleFavorite}
+            className={`flex-row items-center gap-2 px-4 py-2 rounded-full border ${
+              favorited ? 'bg-primary border-primary' : 'bg-surface border-border'
+            }`}
+          >
+            <Text>{favorited ? '⭐' : '☆'}</Text>
+            <Text className={favorited ? 'text-white font-medium' : 'text-text'}>
+              {favoritesCount}
+            </Text>
+          </TouchableOpacity>
 
-  <View className="flex-row items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface">
-    <Text>👁️</Text>
-    <Text className="text-text-secondary">{media.viewsCount || 0}</Text>
-  </View>
+          <View className="flex-row items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface">
+            <Text>👁️</Text>
+            <Text className="text-text-secondary">{media.viewsCount || 0}</Text>
+          </View>
 
-  <TouchableOpacity
-    onPress={shareMedia}
-    className="flex-row items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface"
-  >
-    <Text>📤</Text>
-    <Text className="text-text">Share</Text>
-  </TouchableOpacity>
-</View>
+          <TouchableOpacity
+            onPress={downloadMedia}
+            disabled={downloading}
+            className="flex-row items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface"
+            style={{ opacity: downloading ? 0.6 : 1 }}
+          >
+            <Text>⬇️</Text>
+            <Text className="text-text">{downloading ? 'Opening...' : 'Download'}</Text>
+          </TouchableOpacity>
+        </View>
 
+        {/* AUTHOR */}
         <View className="flex-row items-center gap-3 mt-6 bg-surface rounded-xl p-4">
-  {media.user?.avatarUrl ? (
-    <Image source={{ uri: media.user.avatarUrl }} style={{ width: 48, height: 48, borderRadius: 24 }} />
-  ) : (
-    <View className="w-12 h-12 rounded-full bg-primary items-center justify-center">
-      <Text className="text-white text-lg font-bold">{getUserInitial(media.user)}</Text>
-    </View>
-  )}
-  <View className="flex-1">
-    <Text className="font-semibold text-text">{getUserDisplayName(media.user)}</Text>
-    {media.user?.followersCount !== undefined && (
-      <Text className="text-sm text-text-secondary">{media.user.followersCount} followers</Text>
-    )}
-  </View>
-  {!isOwnPost && (
-    <TouchableOpacity
-      onPress={toggleFollow}
-      className={`px-4 py-2 rounded-full ${following ? 'bg-background border border-border' : 'bg-primary'}`}
-    >
-      <Text className={following ? 'text-text' : 'text-white font-semibold'}>
-        {following ? 'Following' : 'Follow'}
-      </Text>
-    </TouchableOpacity>
-  )}
-</View>
+          {media.user?.avatarUrl ? (
+            <Image
+              source={{ uri: media.user.avatarUrl }}
+              style={{ width: 48, height: 48, borderRadius: 24 }}
+            />
+          ) : (
+            <View className="w-12 h-12 rounded-full bg-primary items-center justify-center">
+              <Text className="text-white text-lg font-bold">{getUserInitial(media.user)}</Text>
+            </View>
+          )}
+          <View className="flex-1">
+            <Text className="font-semibold text-text">{getUserDisplayName(media.user)}</Text>
+            {media.user?.followersCount !== undefined && (
+              <Text className="text-sm text-text-secondary">
+                {media.user.followersCount} followers
+              </Text>
+            )}
+          </View>
+          {!isOwnPost && (
+            <TouchableOpacity
+              onPress={toggleFollow}
+              className={`px-4 py-2 rounded-full ${
+                following ? 'bg-background border border-border' : 'bg-primary'
+              }`}
+            >
+              <Text className={following ? 'text-text' : 'text-white font-semibold'}>
+                {following ? 'Following' : 'Follow'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
-
+        {/* COMMENTS */}
         <View className="mt-6">
-          <Text className="text-xl font-bold text-text mb-4">Comments ({comments.length})</Text>
+          <Text className="text-xl font-bold text-text mb-4">
+            Comments ({comments.length})
+          </Text>
 
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput
-              className="flex-1 bg-surface rounded-full px-4 py-2 border border-border"
+              className="flex-1 bg-surface rounded-full px-4 py-2 border border-border text-text"
               placeholder={user ? 'Add a comment...' : 'Sign in to comment'}
+              placeholderTextColor="#6b7280"
               value={commentText}
               onChangeText={setCommentText}
               editable={!!user}
@@ -334,30 +443,48 @@ const shareMedia = async () => {
             <TouchableOpacity
               onPress={submitComment}
               disabled={!commentText.trim() || !user || postingComment}
-              className={`px-4 py-2 rounded-full ${!commentText.trim() || !user ? 'bg-border' : 'bg-primary'}`}
+              className={`px-4 py-2 rounded-full ${
+                !commentText.trim() || !user ? 'bg-border' : 'bg-primary'
+              }`}
             >
-              <Text className="text-white font-medium">{postingComment ? '...' : 'Post'}</Text>
+              <Text className="text-white font-medium">
+                {postingComment ? '...' : 'Post'}
+              </Text>
             </TouchableOpacity>
           </View>
 
           {comments.length === 0 ? (
-            <Text className="text-text-secondary text-sm">No comments yet. Be the first!</Text>
+            <Text className="text-text-secondary text-sm">
+              No comments yet. Be the first!
+            </Text>
           ) : (
             comments.map((c) => (
               <View key={c.id} className="flex-row gap-3 mb-4">
                 {c.user.avatarUrl ? (
-                  <Image source={{ uri: c.user.avatarUrl }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                  <Image
+                    source={{ uri: c.user.avatarUrl }}
+                    style={{ width: 40, height: 40, borderRadius: 20 }}
+                  />
                 ) : (
                   <View className="w-10 h-10 rounded-full bg-primary items-center justify-center">
-                    <Text className="text-white font-bold">{(c.user.name || 'U')[0].toUpperCase()}</Text>
+                    <Text className="text-white font-bold">
+                      {(c.user.name || c.user.email || 'U')[0].toUpperCase()}
+                    </Text>
                   </View>
                 )}
                 <View className="flex-1">
                   <View className="flex-row items-center gap-2">
-                    <Text className="font-semibold text-sm">{c.user.name || 'User'}</Text>
-                    <Text className="text-xs text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</Text>
+                    <Text className="font-semibold text-sm">
+                      {c.user.name || c.user.email?.split('@')[0] || 'User'}
+                    </Text>
+                    <Text className="text-xs text-text-secondary">
+                      {new Date(c.createdAt).toLocaleDateString()}
+                    </Text>
                     {user?.id === c.user.id && (
-                      <TouchableOpacity onPress={() => deleteComment(c.id)} className="ml-auto">
+                      <TouchableOpacity
+                        onPress={() => deleteComment(c.id)}
+                        className="ml-auto"
+                      >
                         <Text className="text-error text-xs">Delete</Text>
                       </TouchableOpacity>
                     )}
@@ -370,13 +497,16 @@ const shareMedia = async () => {
         </View>
       </View>
 
+      {/* SUGGESTIONS */}
       <Text className="text-xl font-bold text-text px-4 mt-6">More like this</Text>
       <FlatList
         data={suggestions}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ padding: 12 }}
-        renderItem={({ item }) => <SuggestionCard item={item} navigation={navigation} />}
+        renderItem={({ item }) => (
+          <SuggestionCard item={item} navigation={navigation} />
+        )}
         keyExtractor={(item) => item.id}
       />
       <View style={{ height: 40 }} />

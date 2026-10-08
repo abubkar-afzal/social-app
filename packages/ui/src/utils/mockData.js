@@ -1,5 +1,5 @@
 // packages/ui/src/utils/mockData.js
-import { apiUrl, authFetch } from './apiConfig';
+import { apiUrl, authFetch, safeJson } from './apiConfig';
 
 /* -------------------------------------------------------------------------- */
 /*                              MEDIA FETCHERS                                */
@@ -14,21 +14,19 @@ export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
   if (type) params.append('type', String(type).toUpperCase());
 
   const res = await authFetch(apiUrl(`/api/media?${params}`));
-  if (!res.ok) throw new Error('Failed to fetch media');
-
-  const data = await res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Failed to fetch media');
 
   return (data.media || []).map((item) => ({
     ...item,
-    // convert uppercase enum to lowercase for components
     type: item.type.toLowerCase(),
-    // build playable stream URL
+    // Stream URL (goes through your backend — same-origin-like, uses master Drive token)
     src: apiUrl(`/api/media/stream?id=${item.googleDriveFileId}`),
+    // Direct Drive URL (fallback — works cross-origin without auth)
+    fallbackSrc: `https://drive.google.com/thumbnail?id=${item.googleDriveFileId}&sz=w800`,
     thumbnail: item.thumbnailUrl || null,
-    // legacy aliases used by some components
     likes: item.likesCount,
     views: item.viewsCount,
-    // DO NOT touch item.user — keep it as an object: { id, name, avatarUrl, email }
   }));
 };
 
@@ -37,24 +35,25 @@ export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
  */
 export const fetchMediaById = async (id) => {
   const res = await authFetch(apiUrl(`/api/media/${id}`));
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Failed to fetch media');
-  }
+  const item = await safeJson(res);
 
-  const item = await res.json();
+  if (!res.ok) {
+    throw new Error(item?.error || `Failed to fetch media (${res.status})`);
+  }
 
   return {
     ...item,
     type: item.type.toLowerCase(),
+    // Stream URL (goes through your backend)
     src: apiUrl(`/api/media/stream?id=${item.googleDriveFileId}`),
+    // Direct Google Drive URLs — used as fallbacks when stream fails
+    fallbackSrc: `https://drive.google.com/thumbnail?id=${item.googleDriveFileId}&sz=w1600`,
+    fallbackDownloadUrl: `https://drive.google.com/uc?export=download&id=${item.googleDriveFileId}`,
     thumbnail: item.thumbnailUrl || null,
     likes: item.likesCount,
     views: item.viewsCount,
-    // user, liked, favorited, following, isOwnPost all preserved from API response
   };
 };
-
 /**
  * Fetch suggestions (same type, exclude current id).
  */
@@ -77,11 +76,11 @@ export const uploadMedia = async (formData) => {
     method: 'POST',
     body: formData,
   });
+  const data = await safeJson(res);
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Upload failed');
+    throw new Error(data?.error || `Upload failed (${res.status})`);
   }
-  return res.json();
+  return data;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -95,8 +94,9 @@ export const toggleLikeApi = async (mediaId, like) => {
   const res = await authFetch(apiUrl(`/api/media/${mediaId}/like`), {
     method: like ? 'POST' : 'DELETE',
   });
-  if (!res.ok) throw new Error('Like failed');
-  return res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Like failed');
+  return data;
 };
 
 /**
@@ -106,8 +106,9 @@ export const toggleFavoriteApi = async (mediaId, favorite) => {
   const res = await authFetch(apiUrl(`/api/media/${mediaId}/favorite`), {
     method: favorite ? 'POST' : 'DELETE',
   });
-  if (!res.ok) throw new Error('Favorite failed');
-  return res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Favorite failed');
+  return data;
 };
 
 /**
@@ -117,8 +118,9 @@ export const toggleFollowApi = async (userId, follow) => {
   const res = await authFetch(apiUrl(`/api/user/${userId}/follow`), {
     method: follow ? 'POST' : 'DELETE',
   });
-  if (!res.ok) throw new Error('Follow failed');
-  return res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Follow failed');
+  return data;
 };
 
 /**
@@ -137,8 +139,8 @@ export const recordViewApi = async (mediaId) => {
  */
 export const fetchComments = async (mediaId) => {
   const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
-  if (!res.ok) throw new Error('Failed to fetch comments');
-  const data = await res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Failed to fetch comments');
   return data.comments || [];
 };
 
@@ -151,8 +153,9 @@ export const postComment = async (mediaId, text) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
   });
-  if (!res.ok) throw new Error('Failed to post comment');
-  return res.json();
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data?.error || 'Failed to post comment');
+  return data;
 };
 
 /**
@@ -164,7 +167,10 @@ export const deleteComment = async (mediaId, commentId) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ commentId }),
   });
-  if (!res.ok) throw new Error('Failed to delete comment');
+  if (!res.ok) {
+    const data = await safeJson(res).catch(() => ({}));
+    throw new Error(data?.error || 'Failed to delete comment');
+  }
 };
 
 /* -------------------------------------------------------------------------- */

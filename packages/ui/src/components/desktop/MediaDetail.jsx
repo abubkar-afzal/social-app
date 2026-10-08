@@ -4,21 +4,36 @@ import { fetchMediaById, fetchSuggestions } from '../../utils/mockData';
 import { apiUrl, authFetch } from '../../utils/apiConfig';
 import { useAuth } from '../../utils/useAuth';
 import {
-  PlayIcon, PauseIcon, BookmarkIcon, HeartIcon, ShareIcon, EyeIcon,
+  PlayIcon,
+  PauseIcon,
+  BookmarkIcon,
+  HeartIcon,
+  EyeIcon,
+  ArrowDownTrayIcon as DownloadIcon,
 } from '../../icons';
 
-const getUserDisplayName = (user) => {
-  if (!user) return 'Unknown';
-  return user.name || user.email?.split('@')[0] || 'User';
-};
+/* -------------------------------------------------------------------------- */
+/*                                Video Player                                 */
+/* -------------------------------------------------------------------------- */
 
-const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
-
-const VideoPlayer = ({ src }) => {
+const VideoPlayer = ({ src, fallbackSrc }) => {
   const [isMuted, setIsMuted] = useState(true);
   return (
     <div className="relative">
-      <video src={src} className="w-full aspect-video object-cover bg-black" autoPlay muted={isMuted} loop playsInline controls />
+      <video
+        src={src}
+        className="w-full aspect-video object-cover bg-black"
+        autoPlay
+        muted={isMuted}
+        loop
+        playsInline
+        controls
+        onError={(e) => {
+          if (fallbackSrc && e.currentTarget.src !== fallbackSrc) {
+            e.currentTarget.src = fallbackSrc;
+          }
+        }}
+      />
       <button
         onClick={() => setIsMuted(!isMuted)}
         className="absolute bottom-4 right-4 rounded-full bg-black/60 p-2 text-white hover:bg-black/80"
@@ -28,6 +43,10 @@ const VideoPlayer = ({ src }) => {
     </div>
   );
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                Audio Player                                 */
+/* -------------------------------------------------------------------------- */
 
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,6 +61,7 @@ const AudioPlayer = ({ src }) => {
     else audioRef.current.play();
     setIsPlaying(!isPlaying);
   };
+
   const onTimeUpdate = () => {
     if (audioRef.current) {
       const c = audioRef.current.currentTime;
@@ -51,6 +71,7 @@ const AudioPlayer = ({ src }) => {
       setProgress((c / d) * 100);
     }
   };
+
   const fmt = (t) => {
     const m = Math.floor(t / 60);
     const s = Math.floor(t % 60);
@@ -61,7 +82,11 @@ const AudioPlayer = ({ src }) => {
     <div className="w-full aspect-video bg-gradient-to-br from-primary-light via-primary to-primary-dark flex flex-col items-center justify-center p-8">
       <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-6">
         <button onClick={togglePlay} className="p-4">
-          {isPlaying ? <PauseIcon className="h-12 w-12 text-white" /> : <PlayIcon className="h-12 w-12 text-white" />}
+          {isPlaying ? (
+            <PauseIcon className="h-12 w-12 text-white" />
+          ) : (
+            <PlayIcon className="h-12 w-12 text-white" />
+          )}
         </button>
       </div>
       <div className="w-full max-w-md">
@@ -73,32 +98,57 @@ const AudioPlayer = ({ src }) => {
           <div className="bg-white h-2 rounded-full" style={{ width: `${progress}%` }} />
         </div>
       </div>
-      <audio ref={audioRef} src={src} className="hidden" onTimeUpdate={onTimeUpdate} onEnded={() => setIsPlaying(false)} />
+      <audio
+        ref={audioRef}
+        src={src}
+        className="hidden"
+        onTimeUpdate={onTimeUpdate}
+        onEnded={() => setIsPlaying(false)}
+      />
     </div>
   );
 };
+
+/* -------------------------------------------------------------------------- */
+/*                             Suggestion Card                                 */
+/* -------------------------------------------------------------------------- */
 
 const SuggestionCard = ({ item }) => (
   <Link to={`/media/${item.id}`}>
     <div className="group rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
       <div className="aspect-square overflow-hidden">
         {item.type === 'video' && (
-          <video
-            src={item.src}
-            className="w-full h-full object-cover"
-            muted
-            loop
-            playsInline
-            onMouseEnter={(e) => e.target.play()}
-            onMouseLeave={(e) => {
-              e.target.pause();
-              e.target.currentTime = 0;
-            }}
-          />
-        )}
+  <video
+    src={item.src}
+    className="w-full h-full object-cover"
+    muted
+    loop
+    playsInline
+    onMouseEnter={(e) => e.target.play()}
+    onMouseLeave={(e) => {
+      e.target.pause();
+      e.target.currentTime = 0;
+    }}
+    onError={(e) => {
+      if (item.fallbackSrc && e.currentTarget.src !== item.fallbackSrc) {
+        e.currentTarget.src = item.fallbackSrc;
+      }
+    }}
+  />
+)}
         {item.type === 'photo' && (
-          <img src={item.src} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-        )}
+  <img
+    src={item.src}
+    alt={item.title}
+    className="w-full h-full object-cover"
+    loading="lazy"
+    onError={(e) => {
+      if (item.fallbackSrc && e.target.src !== item.fallbackSrc) {
+        e.target.src = item.fallbackSrc;
+      }
+    }}
+  />
+)}
         {item.type === 'audio' && (
           <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
             <PlayIcon className="h-8 w-8 text-white" />
@@ -107,11 +157,45 @@ const SuggestionCard = ({ item }) => (
       </div>
       <div className="p-3">
         <p className="text-sm font-semibold truncate">{item.title}</p>
-        <p className="text-xs text-text-secondary">{item.views} views</p>
+        <p className="text-xs text-text-secondary">{item.viewsCount || 0} views</p>
       </div>
     </div>
   </Link>
 );
+
+/* -------------------------------------------------------------------------- */
+/*                                 Helpers                                     */
+/* -------------------------------------------------------------------------- */
+
+const getUserDisplayName = (user) => {
+  if (!user) return 'Unknown';
+  return user.name || user.email?.split('@')[0] || 'User';
+};
+
+const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
+
+const getFileExtension = (mimeType) => {
+  if (!mimeType) return '';
+  const map = {
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp',
+    'video/mp4': '.mp4',
+    'video/webm': '.webm',
+    'video/quicktime': '.mov',
+    'audio/mpeg': '.mp3',
+    'audio/mp3': '.mp3',
+    'audio/wav': '.wav',
+    'audio/ogg': '.ogg',
+  };
+  return map[mimeType] || '';
+};
+
+/* -------------------------------------------------------------------------- */
+/*                              Main Component                                 */
+/* -------------------------------------------------------------------------- */
 
 export default function DesktopMediaDetail() {
   const { id: mediaId } = useParams();
@@ -127,6 +211,7 @@ export default function DesktopMediaDetail() {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [following, setFollowing] = useState(false);
   const [isOwnPost, setIsOwnPost] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
@@ -148,19 +233,25 @@ export default function DesktopMediaDetail() {
       setFollowing(item.following || false);
       setIsOwnPost(item.isOwnPost || false);
 
+      // Record unique view
       authFetch(apiUrl(`/api/media/${mediaId}/view`), { method: 'POST' }).catch(() => {});
 
+      // Load comments
       try {
         const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
         if (res.ok) {
           const data = await res.json();
           setComments(data.comments || []);
         }
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
 
       const sugg = await fetchSuggestions(item.type, mediaId);
       setSuggestions(sugg);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error('Failed to load media:', e);
+    }
     setLoading(false);
   };
 
@@ -178,7 +269,9 @@ export default function DesktopMediaDetail() {
     setLiked(next);
     setLikesCount((c) => c + (next ? 1 : -1));
     try {
-      await authFetch(apiUrl(`/api/media/${mediaId}/like`), { method: next ? 'POST' : 'DELETE' });
+      await authFetch(apiUrl(`/api/media/${mediaId}/like`), {
+        method: next ? 'POST' : 'DELETE',
+      });
     } catch (e) {
       setLiked(!next);
       setLikesCount((c) => c + (next ? -1 : 1));
@@ -191,7 +284,9 @@ export default function DesktopMediaDetail() {
     setFavorited(next);
     setFavoritesCount((c) => c + (next ? 1 : -1));
     try {
-      await authFetch(apiUrl(`/api/media/${mediaId}/favorite`), { method: next ? 'POST' : 'DELETE' });
+      await authFetch(apiUrl(`/api/media/${mediaId}/favorite`), {
+        method: next ? 'POST' : 'DELETE',
+      });
     } catch (e) {
       setFavorited(!next);
       setFavoritesCount((c) => c + (next ? -1 : 1));
@@ -203,24 +298,37 @@ export default function DesktopMediaDetail() {
     const next = !following;
     setFollowing(next);
     try {
-      await authFetch(apiUrl(`/api/user/${media.userId}/follow`), { method: next ? 'POST' : 'DELETE' });
-    } catch (e) { setFollowing(!next); }
+      await authFetch(apiUrl(`/api/user/${media.userId}/follow`), {
+        method: next ? 'POST' : 'DELETE',
+      });
+    } catch (e) {
+      setFollowing(!next);
+    }
   };
 
-  const shareMedia = async () => {
-    const url = `http://localhost:3000/media/${media.id}`;
+  /* ----------------------------- Download ----------------------------- */
+  const downloadMedia = async () => {
+    if (!media) return;
+    setDownloading(true);
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: media.title,
-          text: media.description || 'Check out this post on AR Media!',
-          url,
-        });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        alert('Link copied to clipboard!');
-      }
-    } catch (e) {}
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${media.googleDriveFileId}`;
+      const ext = getFileExtension(media.mimeType);
+      const filename = `${(media.title || 'media').replace(/[^\w\s-]/g, '').trim()}${ext}`;
+
+      // Create a temporary anchor and trigger a download
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      // a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      console.error('Download failed:', e);
+      alert('Download failed. Try again.');
+    }
+    setDownloading(false);
   };
 
   const submitComment = async (e) => {
@@ -239,7 +347,9 @@ export default function DesktopMediaDetail() {
         setComments((prev) => [newComment, ...prev]);
         setCommentText('');
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     setPostingComment(false);
   };
 
@@ -253,7 +363,9 @@ export default function DesktopMediaDetail() {
         body: JSON.stringify({ commentId }),
       });
       if (res.ok) setComments((prev) => prev.filter((c) => c.id !== commentId));
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   if (loading || !media) {
@@ -269,22 +381,39 @@ export default function DesktopMediaDetail() {
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* MAIN */}
         <div className="lg:col-span-2">
           <div className="rounded-xl overflow-hidden bg-surface shadow-lg">
-            {media.type === 'video' && <VideoPlayer src={media.src} />}
-            {media.type === 'photo' && <img src={media.src} alt={media.title} className="w-full object-cover" />}
+            {media.type === 'video' &&  <VideoPlayer src={media.src} fallbackSrc={media.fallbackSrc} />
+}
+            {media.type === 'photo' && (
+  <img
+    src={media.src}
+    alt={media.title}
+    className="w-full object-cover"
+    onError={(e) => {
+      if (media.fallbackSrc && e.target.src !== media.fallbackSrc) {
+        e.target.src = media.fallbackSrc;
+      }
+    }}
+  />
+)}
             {media.type === 'audio' && <AudioPlayer src={media.src} />}
           </div>
 
           <div className="mt-6">
             <h1 className="text-2xl font-bold text-text">{media.title}</h1>
-            {media.description && <p className="text-text-secondary mt-1">{media.description}</p>}
+            {media.description && (
+              <p className="text-text-secondary mt-1">{media.description}</p>
+            )}
 
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 onClick={toggleLike}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
-                  liked ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
+                  liked
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-surface text-text border-border hover:border-primary'
                 }`}
               >
                 <HeartIcon className="h-5 w-5" />
@@ -294,7 +423,9 @@ export default function DesktopMediaDetail() {
               <button
                 onClick={toggleFavorite}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
-                  favorited ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
+                  favorited
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-surface text-text border-border hover:border-primary'
                 }`}
               >
                 <BookmarkIcon className="h-5 w-5" />
@@ -307,18 +438,24 @@ export default function DesktopMediaDetail() {
               </div>
 
               <button
-                onClick={shareMedia}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text hover:border-primary transition"
+                onClick={downloadMedia}
+                disabled={downloading}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text hover:border-primary hover:text-primary transition disabled:opacity-50"
               >
-                <ShareIcon className="h-5 w-5" />
-                <span>Share</span>
+                <DownloadIcon className="h-5 w-5" />
+                <span>{downloading ? 'Downloading...' : 'Download'}</span>
               </button>
             </div>
           </div>
 
+          {/* AUTHOR */}
           <div className="flex items-center gap-4 mt-6 bg-surface rounded-xl p-4">
             {media.user?.avatarUrl ? (
-              <img src={media.user.avatarUrl} alt={posterName} className="w-14 h-14 rounded-full object-cover" />
+              <img
+                src={media.user.avatarUrl}
+                alt={posterName}
+                className="w-14 h-14 rounded-full object-cover"
+              />
             ) : (
               <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold">
                 {getUserInitial(media.user)}
@@ -327,14 +464,18 @@ export default function DesktopMediaDetail() {
             <div className="flex-1">
               <p className="font-semibold text-text">{posterName}</p>
               {media.user?.followersCount !== undefined && (
-                <p className="text-sm text-text-secondary">{media.user.followersCount} followers</p>
+                <p className="text-sm text-text-secondary">
+                  {media.user.followersCount} followers
+                </p>
               )}
             </div>
             {!isOwnPost && (
               <button
                 onClick={toggleFollow}
                 className={`px-6 py-2 rounded-full font-medium transition ${
-                  following ? 'bg-background text-text border border-border' : 'bg-primary text-white hover:bg-primary-dark'
+                  following
+                    ? 'bg-background text-text border border-border'
+                    : 'bg-primary text-white hover:bg-primary-dark'
                 }`}
               >
                 {following ? 'Following' : 'Follow'}
@@ -342,15 +483,18 @@ export default function DesktopMediaDetail() {
             )}
           </div>
 
+          {/* COMMENTS */}
           <div className="mt-6">
-            <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
+            <h2 className="text-xl font-bold text-text mb-4">
+              Comments ({comments.length})
+            </h2>
 
             <form onSubmit={submitComment} className="flex gap-3 mb-6">
               {user?.avatarUrl ? (
                 <img src={user.avatarUrl} alt="You" className="w-10 h-10 rounded-full object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
-                  {(user?.name || 'U')[0].toUpperCase()}
+                  {(user?.name || user?.email || 'U')[0].toUpperCase()}
                 </div>
               )}
               <input
@@ -371,24 +515,37 @@ export default function DesktopMediaDetail() {
             </form>
 
             {comments.length === 0 ? (
-              <p className="text-text-secondary text-sm">No comments yet. Be the first!</p>
+              <p className="text-text-secondary text-sm">
+                No comments yet. Be the first!
+              </p>
             ) : (
               <div className="space-y-4">
                 {comments.map((c) => (
                   <div key={c.id} className="flex gap-3">
                     {c.user.avatarUrl ? (
-                      <img src={c.user.avatarUrl} alt={c.user.name || 'User'} className="w-10 h-10 rounded-full object-cover" />
+                      <img
+                        src={c.user.avatarUrl}
+                        alt={c.user.name || 'User'}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
-                        {(c.user.name || 'U')[0].toUpperCase()}
+                        {(c.user.name || c.user.email || 'U')[0].toUpperCase()}
                       </div>
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-sm">{c.user.name || 'User'}</p>
-                        <p className="text-xs text-text-secondary">{new Date(c.createdAt).toLocaleDateString()}</p>
+                        <p className="font-semibold text-sm">
+                          {c.user.name || c.user.email?.split('@')[0] || 'User'}
+                        </p>
+                        <p className="text-xs text-text-secondary">
+                          {new Date(c.createdAt).toLocaleDateString()}
+                        </p>
                         {user?.id === c.user.id && (
-                          <button onClick={() => deleteComment(c.id)} className="ml-auto text-error text-xs hover:underline">
+                          <button
+                            onClick={() => deleteComment(c.id)}
+                            className="ml-auto text-error text-xs hover:underline"
+                          >
                             Delete
                           </button>
                         )}
@@ -402,10 +559,13 @@ export default function DesktopMediaDetail() {
           </div>
         </div>
 
+        {/* SUGGESTIONS */}
         <div className="lg:col-span-1">
           <h2 className="text-xl font-bold text-text mb-4">More like this</h2>
           <div className="grid grid-cols-2 gap-4">
-            {suggestions.map((item) => <SuggestionCard key={item.id} item={item} />)}
+            {suggestions.map((item) => (
+              <SuggestionCard key={item.id} item={item} />
+            ))}
           </div>
         </div>
       </div>

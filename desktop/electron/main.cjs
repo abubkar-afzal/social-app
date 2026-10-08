@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
+const isDev = !app.isPackaged;
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
@@ -8,21 +10,21 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      // Only relax security in dev so cross-origin images/videos from the Vercel API load.
+      // In production, use same-origin or a proper CSP.
+      webSecurity: !isDev,
     },
   });
 
-  // In development (not packaged), load Vite dev server
-  if (!app.isPackaged) {
+  if (isDev) {
     win.loadURL('http://localhost:5173');
   } else {
-    // In production, load the built index.html
     win.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 }
 
 app.whenReady().then(() => {
   createWindow();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

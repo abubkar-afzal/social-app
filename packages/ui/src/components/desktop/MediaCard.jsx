@@ -67,7 +67,18 @@ export const DesktopMediaCardItem = ({ media }) => {
           ) : media.type === 'audio' ? (
             <AudioPlayer src={media.src} />
           ) : (
-            <img src={media.src} alt={media.title} className="w-full h-full object-cover" loading="lazy" />
+            <img
+  src={media.src}
+  alt={media.title}
+  className="w-full h-full object-cover"
+  loading="lazy"
+  onError={(e) => {
+    // If the stream fails, fall back to the direct Drive thumbnail URL
+    if (media.fallbackSrc && e.target.src !== media.fallbackSrc) {
+      e.target.src = media.fallbackSrc;
+    }
+  }}
+/>
           )}
         </div>
 

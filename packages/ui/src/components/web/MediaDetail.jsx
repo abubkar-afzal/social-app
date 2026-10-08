@@ -8,8 +8,8 @@ import {
   PauseIcon,
   BookmarkIcon,
   HeartIcon,
-  ShareIcon,
   EyeIcon,
+  ArrowDownTrayIcon as DownloadIcon,
 } from '../../icons';
 
 const VideoPlayer = ({ src }) => {
@@ -102,15 +102,30 @@ const SuggestionCard = ({ item }) => (
   </Link>
 );
 
-// Helper to get a display name from a user object
 const getUserDisplayName = (user) => {
   if (!user) return 'Unknown';
   return user.name || user.email?.split('@')[0] || 'User';
 };
 
-const getUserInitial = (user) => {
-  const name = getUserDisplayName(user);
-  return name.charAt(0).toUpperCase();
+const getUserInitial = (user) => getUserDisplayName(user).charAt(0).toUpperCase();
+
+const getFileExtension = (mimeType) => {
+  if (!mimeType) return '';
+  const map = {
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp',
+    'video/mp4': '.mp4',
+    'video/webm': '.webm',
+    'video/quicktime': '.mov',
+    'audio/mpeg': '.mp3',
+    'audio/mp3': '.mp3',
+    'audio/wav': '.wav',
+    'audio/ogg': '.ogg',
+  };
+  return map[mimeType] || '';
 };
 
 export default function MediaDetail({ mediaId }) {
@@ -125,6 +140,7 @@ export default function MediaDetail({ mediaId }) {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [following, setFollowing] = useState(false);
   const [isOwnPost, setIsOwnPost] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
@@ -146,10 +162,8 @@ export default function MediaDetail({ mediaId }) {
       setFollowing(item.following || false);
       setIsOwnPost(item.isOwnPost || false);
 
-      // Record unique view
       authFetch(apiUrl(`/api/media/${mediaId}/view`), { method: 'POST' }).catch(() => {});
 
-      // Load comments
       try {
         const res = await fetch(apiUrl(`/api/media/${mediaId}/comments`));
         if (res.ok) {
@@ -206,30 +220,32 @@ export default function MediaDetail({ mediaId }) {
     setFollowing(next);
     try {
       await authFetch(apiUrl(`/api/user/${media.userId}/follow`), { method: next ? 'POST' : 'DELETE' });
-    } catch (e) {
-      setFollowing(!next);
-    }
+    } catch (e) { setFollowing(!next); }
   };
 
-  const shareMedia = async () => {
-    const url = typeof window !== 'undefined' ? window.location.href : '';
-    const shareData = {
-      title: media.title,
-      text: media.description || 'Check out this post on AR Media!',
-      url,
-    };
+  /* ------------------ Download ------------------ */
+  const downloadMedia = async () => {
+    if (!media) return;
+    setDownloading(true);
     try {
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share(shareData);
-      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        alert('Link copied to clipboard!');
-      } else {
-        alert(url);
-      }
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${media.googleDriveFileId}`;
+      const ext = getFileExtension(media.mimeType);
+      const filename = `${(media.title || 'media').replace(/[^\w\s-]/g, '').trim()}${ext}`;
+
+      // Create a temporary anchor and trigger a download
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (e) {
-      // User cancelled — do nothing
+      console.error('Download failed:', e);
+      alert('Download failed. Try again.');
     }
+    setDownloading(false);
   };
 
   const submitComment = async (e) => {
@@ -285,14 +301,10 @@ export default function MediaDetail({ mediaId }) {
             {media.type === 'audio' && <AudioPlayer src={media.src} />}
           </div>
 
-          {/* Title + stats */}
           <div className="mt-6">
             <h1 className="text-2xl font-bold text-text">{media.title}</h1>
-            {media.description && (
-              <p className="text-text-secondary mt-1">{media.description}</p>
-            )}
+            {media.description && <p className="text-text-secondary mt-1">{media.description}</p>}
 
-            {/* Action bar — likes, favorites, views, share */}
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 onClick={toggleLike}
@@ -319,30 +331,22 @@ export default function MediaDetail({ mediaId }) {
                 <span>{media.viewsCount || 0}</span>
               </div>
 
+              {/* 👇 Download replaces Share */}
               <button
-                onClick={shareMedia}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text hover:border-primary transition"
+                onClick={downloadMedia}
+                disabled={downloading}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-surface text-text hover:border-primary hover:text-primary transition disabled:opacity-50"
               >
-                <ShareIcon className="h-5 w-5" />
-                <span>Share</span>
+                <DownloadIcon className="h-5 w-5" />
+                <span>{downloading ? 'Downloading...' : 'Download'}</span>
               </button>
             </div>
           </div>
 
-          {/* Author — just name and follow, no views */}
           <div className="flex items-center gap-4 mt-6 bg-surface rounded-xl p-4">
             {media.user?.avatarUrl ? (
-              <img
-                src={media.user.avatarUrl}
-                alt={posterName}
-                className="w-14 h-14 rounded-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling?.style?.setProperty('display', 'flex');
-                }}
-              />
-            ) : null}
-            {!media.user?.avatarUrl && (
+              <img src={media.user.avatarUrl} alt={posterName} className="w-14 h-14 rounded-full object-cover" />
+            ) : (
               <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold">
                 {getUserInitial(media.user)}
               </div>
@@ -350,9 +354,7 @@ export default function MediaDetail({ mediaId }) {
             <div className="flex-1">
               <p className="font-semibold text-text">{posterName}</p>
               {media.user?.followersCount !== undefined && (
-                <p className="text-sm text-text-secondary">
-                  {media.user.followersCount} followers
-                </p>
+                <p className="text-sm text-text-secondary">{media.user.followersCount} followers</p>
               )}
             </div>
             {!isOwnPost && (
@@ -367,7 +369,6 @@ export default function MediaDetail({ mediaId }) {
             )}
           </div>
 
-          {/* Comments */}
           <div className="mt-6">
             <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
 

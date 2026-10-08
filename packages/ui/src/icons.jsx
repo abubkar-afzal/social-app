@@ -27,7 +27,7 @@ export {
   PencilSquareIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
-  ArrowDownTrayIcon as DownloadIcon,
+  ArrowDownTrayIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   EyeIcon,

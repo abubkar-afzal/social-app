@@ -1,3 +1,4 @@
+import './config';                    // ← must be first
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/globals.css';

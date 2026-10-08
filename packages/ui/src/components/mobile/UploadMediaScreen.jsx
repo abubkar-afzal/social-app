@@ -5,14 +5,14 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import { apiUrl } from '../../utils/apiConfig';
+import { storage } from '../../utils/storage';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useAudioPlayer } from 'expo-audio';
 
 export default function UploadMediaScreen() {
-  const [file, setFile] = useState(null); // { uri, name, mimeType }
+  const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [type, setType] = useState('PHOTO');
   const [description, setDescription] = useState('');
@@ -25,14 +25,11 @@ export default function UploadMediaScreen() {
       Alert.alert('Permission denied', 'Photo access is required.');
       return;
     }
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,             // ✨ native crop UI
+      allowsEditing: true,
       quality: 0.9,
-      // aspect is omitted so user can crop freely
     });
-
     if (!result.canceled) {
       const asset = result.assets[0];
       setFile({
@@ -47,7 +44,7 @@ export default function UploadMediaScreen() {
   const pickVideo = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsEditing: false,   // videos can't be cropped with ImagePicker
+      allowsEditing: false,
       quality: 0.9,
     });
     if (!result.canceled) {
@@ -92,36 +89,50 @@ export default function UploadMediaScreen() {
     }
     setUploading(true);
     try {
-      const token = await SecureStore.getItemAsync('authToken');
+      const token = await storage.getItem('authToken');
+      if (!token) throw new Error('You must be signed in to upload.');
+
+      // 1. Read the local file into a Blob via fetch (works for file:// URIs).
+      //    This is the RN 0.86+ compatible way — plain { uri, name, type } is no longer supported.
+      const fileResponse = await fetch(file.uri);
+      const rawBlob = await fileResponse.blob();
+
+      // Ensure the blob carries the correct MIME type
+      const blob = rawBlob.type === file.mimeType
+        ? rawBlob
+        : new Blob([rawBlob], { type: file.mimeType });
+
+      // 2. Build FormData with the Blob (do NOT set Content-Type manually)
       const formData = new FormData();
-      formData.append('file', {
-        uri: file.uri,
-        name: file.name,
-        type: file.mimeType,
-      });
+      formData.append('file', blob, file.name);
       formData.append('title', title);
       formData.append('type', type);
       formData.append('description', description || '');
 
+      // 3. Send
       const res = await fetch(apiUrl('/api/media/upload'), {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
+
+      const responseText = await res.text();
+      let data = {};
+      try { data = JSON.parse(responseText); } catch {}
+
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Upload failed');
+        throw new Error(data.error || `Upload failed (${res.status})`);
       }
-      const data = await res.json();
+
       Alert.alert('Success', 'Post created');
       navigation.replace('MediaDetail', { mediaId: data.id, type });
     } catch (e) {
-      Alert.alert('Error', e.message);
+      console.error('Upload error:', e);
+      Alert.alert('Error', e.message || 'Upload failed');
     }
     setUploading(false);
   };
 
-  /* ------------------ Inline preview renderers ------------------ */
   const renderPreview = () => {
     if (!file) return null;
 
@@ -183,21 +194,22 @@ export default function UploadMediaScreen() {
         <Text className="text-2xl font-bold text-text mb-6">Create Post</Text>
 
         <TextInput
-          className="bg-surface rounded-lg px-4 py-3 mb-4 border border-border"
+          className="bg-surface rounded-lg px-4 py-3 mb-4 border border-border text-text"
           placeholder="Title"
+          placeholderTextColor="#6b7280"
           value={title}
           onChangeText={setTitle}
         />
 
         <TextInput
-          className="bg-surface rounded-lg px-4 py-3 mb-4 border border-border"
+          className="bg-surface rounded-lg px-4 py-3 mb-4 border border-border text-text"
           placeholder="Description (optional)"
+          placeholderTextColor="#6b7280"
           value={description}
           onChangeText={setDescription}
           multiline
         />
 
-        {/* Picker */}
         <TouchableOpacity
           onPress={pickFile}
           className="bg-surface border-2 border-dashed border-border rounded-lg py-6 mb-4 items-center"
@@ -211,7 +223,6 @@ export default function UploadMediaScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Preview */}
         {file && (
           <View className="mb-4">
             <View className="flex-row justify-between items-center mb-2">

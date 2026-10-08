@@ -8,19 +8,26 @@ const nextConfig = {
       { protocol: 'https', hostname: 'drive.google.com' },
       { protocol: 'https', hostname: 'i.pravatar.cc' },
       { protocol: 'https', hostname: 'picsum.photos' },
-      { protocol: 'https', hostname: 'www.w3schools.com' },
-      { protocol: 'https', hostname: 'interactive-examples.mdn.mozilla.net' },
     ],
   },
 
   async headers() {
     return [
       {
+        // Match all API routes
         source: '/api/:path*',
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-Requested-With, Accept, Origin',
+          },
+          { key: 'Access-Control-Max-Age', value: '86400' },
+          { key: 'Access-Control-Expose-Headers', value: 'Content-Length, Content-Type' },
         ],
       },
     ];

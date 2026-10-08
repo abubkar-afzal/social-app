@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import DesktopNavbar from '../../packages/ui/src/components/desktop/Navbar';
 import DesktopHero from '../../packages/ui/src/components/desktop/Hero';
 import DesktopVideoGrid from '../../packages/ui/src/components/desktop/VideoGrid';
@@ -8,20 +9,18 @@ import DesktopAudioGrid from '../../packages/ui/src/components/desktop/AudioGrid
 import DesktopMediaDetail from '../../packages/ui/src/components/desktop/MediaDetail';
 import DesktopLogin from '../../packages/ui/src/components/desktop/LoginPage';
 import DesktopAccount from '../../packages/ui/src/components/desktop/AccountPage';
-import DesktopFooter from '../../packages/ui/src/components/desktop/Footer';
-import AboutPage from '../../packages/ui/src/components/desktop/AboutPage';
-import CareersPage from '../../packages/ui/src/components/desktop/CareersPage';
-import PressPage from '../../packages/ui/src/components/desktop/PressPage';
-import BlogPage from '../../packages/ui/src/components/desktop/BlogPage';
-import HelpPage from '../../packages/ui/src/components/desktop/HelpPage';
-import GuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
+import DesktopUploadMedia from '../../packages/ui/src/components/desktop/UploadMediaPage';
 import DesktopFavoritesGrid from '../../packages/ui/src/components/desktop/FavoritesGrid';
+import DesktopFooter from '../../packages/ui/src/components/desktop/Footer';
+
+import DesktopAboutPage from '../../packages/ui/src/components/desktop/AboutPage';
+import DesktopCareersPage from '../../packages/ui/src/components/desktop/CareersPage';
+import DesktopPressPage from '../../packages/ui/src/components/desktop/PressPage';
+import DesktopBlogPage from '../../packages/ui/src/components/desktop/BlogPage';
+import DesktopHelpPage from '../../packages/ui/src/components/desktop/HelpPage';
+import DesktopGuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
 import DesktopPrivacyPage from '../../packages/ui/src/components/desktop/PrivacyPage';
 import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage';
-
-import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
-
-setApiBaseUrl('https://ar-media-sigma.vercel.app'); // Replace with your actual API base URL
 
 export default function App() {
   return (
@@ -37,17 +36,18 @@ export default function App() {
             <Route path="/media/:id" element={<DesktopMediaDetail />} />
             <Route path="/login" element={<DesktopLogin />} />
             <Route path="/account" element={<DesktopAccount />} />
-            <Route path="/about" element={<AboutPage />} />
+            <Route path="/uploadmedia" element={<DesktopUploadMedia />} />
             <Route path="/favorites" element={<DesktopFavoritesGrid />} />
 
-<Route path="/careers" element={<CareersPage />} />
-<Route path="/press" element={<PressPage />} />
-<Route path="/blog" element={<BlogPage />} />
-<Route path="/help" element={<HelpPage />} />
-<Route path="/guidelines" element={<GuidelinesPage />} />
-<Route path="/uploadmedia" element={<DesktopUploadMedia />} />
-<Route path="/privacy" element={<DesktopPrivacyPage />} />
-<Route path="/terms" element={<DesktopTermsPage />} />
+            {/* Info pages */}
+            <Route path="/about" element={<DesktopAboutPage />} />
+            <Route path="/careers" element={<DesktopCareersPage />} />
+            <Route path="/press" element={<DesktopPressPage />} />
+            <Route path="/blog" element={<DesktopBlogPage />} />
+            <Route path="/help" element={<DesktopHelpPage />} />
+            <Route path="/guidelines" element={<DesktopGuidelinesPage />} />
+            <Route path="/privacy" element={<DesktopPrivacyPage />} />
+            <Route path="/terms" element={<DesktopTermsPage />} />
           </Routes>
         </main>
         <DesktopFooter />

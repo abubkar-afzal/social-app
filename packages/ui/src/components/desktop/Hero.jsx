@@ -17,14 +17,20 @@ const VideoCard = ({ video }) => (
   <Link to={`/media/${video.id}`}>
     <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
       <video
-        src={video.src}
-        className="w-full h-full object-cover"
-        muted
-        loop
-        autoPlay
-        playsInline
-        preload="auto"
-      />
+  src={video.src}
+  className="w-full h-full object-cover"
+  muted
+  loop
+  autoPlay
+  playsInline
+  preload="auto"
+  onError={(e) => {
+    // Fallback: try direct Drive URL
+    if (video.fallbackSrc && e.currentTarget.src !== video.fallbackSrc) {
+      e.currentTarget.src = video.fallbackSrc;
+    }
+  }}
+/>
       <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
         <div className="flex items-center gap-2 mb-1">
           {video.user?.avatarUrl ? (
@@ -46,7 +52,17 @@ const VideoCard = ({ video }) => (
 const PhotoCard = ({ photo }) => (
   <Link to={`/media/${photo.id}`}>
     <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
-      <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" loading="lazy" />
+      <img
+  src={photo.src}
+  alt={photo.title}
+  className="w-full h-full object-cover"
+  loading="lazy"
+  onError={(e) => {
+    if (photo.fallbackSrc && e.target.src !== photo.fallbackSrc) {
+      e.target.src = photo.fallbackSrc;
+    }
+  }}
+/>
       <div className="absolute inset-0 opacity-100 transition-opacity flex flex-col justify-between p-3">
         <div className="flex justify-end">
 

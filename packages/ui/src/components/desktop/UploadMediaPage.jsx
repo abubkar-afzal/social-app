@@ -2,10 +2,14 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CropperModal from './CropperModal';
 import { apiUrl, authFetch, getStoredToken } from '../../utils/apiConfig';
-import { PencilSquareIcon as EditIcon, XMarkIcon as CloseIcon } from '../../icons';
+import {
+  PencilSquareIcon as EditIcon,
+  XMarkIcon as CloseIcon,
+} from '../../icons';
 
 export default function DesktopUploadMedia() {
   const navigate = useNavigate();
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState('');
   const [croppedBlob, setCroppedBlob] = useState(null);
@@ -15,17 +19,24 @@ export default function DesktopUploadMedia() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [cropperOpen, setCropperOpen] = useState(false);
+
   const fileInputRef = useRef(null);
 
-  const acceptFor = { PHOTO: 'image/*', VIDEO: 'video/*', AUDIO: 'audio/*' };
+  const acceptFor = {
+    PHOTO: 'image/*',
+    VIDEO: 'video/*',
+    AUDIO: 'audio/*',
+  };
 
   const handleFileSelect = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
+
     let detected = 'PHOTO';
     if (f.type.startsWith('video/')) detected = 'VIDEO';
     else if (f.type.startsWith('audio/')) detected = 'AUDIO';
     setType(detected);
+
     setFile(f);
     setCroppedBlob(null);
     setPreview(URL.createObjectURL(f));
@@ -39,6 +50,7 @@ export default function DesktopUploadMedia() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!getStoredToken()) {
       navigate('/login');
       return;
@@ -47,16 +59,19 @@ export default function DesktopUploadMedia() {
       setError('Please provide a title and select a file.');
       return;
     }
+
     setUploading(true);
     setError('');
 
     try {
       const formData = new FormData();
+
       if (croppedBlob) {
         formData.append('file', croppedBlob, `cropped_${Date.now()}.jpg`);
       } else {
         formData.append('file', file);
       }
+
       formData.append('title', title);
       formData.append('type', type);
       formData.append('description', description || '');
@@ -65,8 +80,10 @@ export default function DesktopUploadMedia() {
         method: 'POST',
         body: formData,
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+
       navigate(`/media/${data.id}`);
     } catch (err) {
       setError(err.message);
@@ -92,7 +109,7 @@ export default function DesktopUploadMedia() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-3 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text"
             placeholder="Give your post a title"
             required
           />
@@ -105,9 +122,14 @@ export default function DesktopUploadMedia() {
               <button
                 key={t}
                 type="button"
-                onClick={() => { setType(t); clearFile(); }}
+                onClick={() => {
+                  setType(t);
+                  clearFile();
+                }}
                 className={`flex-1 py-3 rounded-lg font-medium transition ${
-                  type === t ? 'bg-primary text-white' : 'bg-background border border-border text-text'
+                  type === t
+                    ? 'bg-primary text-white'
+                    : 'bg-background border border-border text-text hover:bg-surface'
                 }`}
               >
                 {t}
@@ -122,12 +144,14 @@ export default function DesktopUploadMedia() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-3 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text"
+            placeholder="Tell us about your post"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">File</label>
+
           {!preview ? (
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition">
               <input
@@ -141,13 +165,28 @@ export default function DesktopUploadMedia() {
               <label htmlFor="file-input-desktop" className="cursor-pointer block">
                 <p className="text-4xl mb-2">📁</p>
                 <p className="text-text font-medium">Click to select a file</p>
+                <p className="text-xs text-text-secondary mt-1">
+                  {type === 'PHOTO'
+                    ? 'JPG, PNG, WEBP'
+                    : type === 'VIDEO'
+                    ? 'MP4, WEBM'
+                    : 'MP3, WAV'}
+                </p>
               </label>
             </div>
           ) : (
             <div className="relative rounded-lg overflow-hidden border border-border bg-black">
-              {type === 'PHOTO' && <img src={preview} alt="Preview" className="w-full max-h-96 object-contain" />}
-              {type === 'VIDEO' && <video src={preview} controls className="w-full max-h-96" />}
-              {type === 'AUDIO' && <div className="p-4 bg-surface"><audio src={preview} controls className="w-full" /></div>}
+              {type === 'PHOTO' && (
+                <img src={preview} alt="Preview" className="w-full max-h-96 object-contain" />
+              )}
+              {type === 'VIDEO' && (
+                <video src={preview} controls className="w-full max-h-96" />
+              )}
+              {type === 'AUDIO' && (
+                <div className="p-4 bg-surface">
+                  <audio src={preview} controls className="w-full" />
+                </div>
+              )}
 
               <div className="absolute top-2 right-2 flex gap-1">
                 {type === 'PHOTO' && (
@@ -164,6 +203,7 @@ export default function DesktopUploadMedia() {
                   type="button"
                   onClick={clearFile}
                   className="rounded-full bg-white/90 p-2 hover:bg-error hover:text-white shadow"
+                  title="Remove"
                 >
                   <CloseIcon className="h-4 w-4" />
                 </button>
@@ -179,7 +219,9 @@ export default function DesktopUploadMedia() {
         </div>
 
         {error && (
-          <div className="bg-error/10 border border-error text-error rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-error/10 border border-error text-error rounded-lg p-3 text-sm">
+            {error}
+          </div>
         )}
 
         <button

@@ -1,4 +1,4 @@
-import './config';                    // ← must be first
+import './config';                    // ← MUST be first
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/globals.css';

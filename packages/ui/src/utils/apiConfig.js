@@ -1,3 +1,4 @@
+// packages/ui/src/utils/apiConfig.js
 let API_BASE_URL = '';
 
 export const setApiBaseUrl = (url) => {
@@ -8,6 +9,10 @@ export const getApiBaseUrl = () => API_BASE_URL;
 
 export const apiUrl = (path) => {
   if (!path.startsWith('/')) path = '/' + path;
+  // If no base URL is set, fall back to Vercel (production)
+  if (!API_BASE_URL && typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+    return `https://ar-media-sigma.vercel.app${path}`;
+  }
   return `${API_BASE_URL}${path}`;
 };
 

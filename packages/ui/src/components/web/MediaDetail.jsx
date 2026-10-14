@@ -292,8 +292,8 @@ export default function MediaDetail({ mediaId }) {
   const posterName = getUserDisplayName(media.user);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
         <div className="lg:col-span-2">
           <div className="rounded-xl overflow-hidden bg-surface shadow-lg">
             {media.type === 'video' && <VideoPlayer src={media.src} />}
@@ -305,16 +305,16 @@ export default function MediaDetail({ mediaId }) {
             <h1 className="text-2xl font-bold text-text">{media.title}</h1>
             {media.description && <p className="text-text-secondary mt-1">{media.description}</p>}
 
-            <div className="flex flex-wrap gap-3 mt-4">
-              <button
-                onClick={toggleLike}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
-                  liked ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
-                }`}
-              >
-                <HeartIcon className="h-5 w-5" />
-                <span>{likesCount}</span>
-              </button>
+           <div className="flex flex-wrap gap-2 sm:gap-3 mt-4">
+  <button
+    onClick={toggleLike}
+    className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full border text-sm transition ${
+      liked ? 'bg-primary text-white border-primary' : 'bg-surface text-text border-border hover:border-primary'
+    }`}
+  >
+    <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+    <span>{likesCount}</span>
+  </button>
 
               <button
                 onClick={toggleFavorite}
@@ -343,59 +343,59 @@ export default function MediaDetail({ mediaId }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mt-6 bg-surface rounded-xl p-4">
-            {media.user?.avatarUrl ? (
-              <img src={media.user.avatarUrl} alt={posterName} className="w-14 h-14 rounded-full object-cover" />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold">
-                {getUserInitial(media.user)}
-              </div>
-            )}
-            <div className="flex-1">
-              <p className="font-semibold text-text">{posterName}</p>
-              {media.user?.followersCount !== undefined && (
-                <p className="text-sm text-text-secondary">{media.user.followersCount} followers</p>
-              )}
-            </div>
-            {!isOwnPost && (
-              <button
-                onClick={toggleFollow}
-                className={`px-6 py-2 rounded-full font-medium transition ${
-                  following ? 'bg-background text-text border border-border' : 'bg-primary text-white hover:bg-primary-dark'
-                }`}
-              >
-                {following ? 'Following' : 'Follow'}
-              </button>
-            )}
-          </div>
+         <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4 sm:mt-6 bg-surface rounded-xl p-3 sm:p-4">
+  {media.user?.avatarUrl ? (
+    <img src={media.user.avatarUrl} alt={posterName} className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover" />
+  ) : (
+    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary flex items-center justify-center text-white text-sm sm:text-xl font-bold">
+      {getUserInitial(media.user)}
+    </div>
+  )}
+  <div className="flex-1 min-w-0">
+    <p className="font-semibold text-sm sm:text-base truncate">{posterName}</p>
+    {media.user?.followersCount !== undefined && (
+      <p className="text-xs sm:text-sm text-text-secondary">{media.user.followersCount} followers</p>
+    )}
+  </div>
+  {!isOwnPost && (
+    <button
+      onClick={toggleFollow}
+      className={`px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition shrink-0 ${
+        following ? 'bg-background text-text border border-border' : 'bg-primary text-white hover:bg-primary-dark'
+      }`}
+    >
+      {following ? 'Following' : 'Follow'}
+    </button>
+  )}
+</div>
 
           <div className="mt-6">
             <h2 className="text-xl font-bold text-text mb-4">Comments ({comments.length})</h2>
 
-            <form onSubmit={submitComment} className="flex gap-3 mb-6">
-              {user?.avatarUrl ? (
-                <img src={user.avatarUrl} alt="You" className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
-                  {(user?.name || user?.email || 'U')[0].toUpperCase()}
-                </div>
-              )}
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder={user ? 'Add a comment...' : 'Sign in to comment'}
-                disabled={!user}
-                className="flex-1 bg-surface rounded-full px-4 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={postingComment || !commentText.trim() || !user}
-                className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark disabled:opacity-50"
-              >
-                {postingComment ? '...' : 'Post'}
-              </button>
-            </form>
+            <form onSubmit={submitComment} className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
+  {user?.avatarUrl ? (
+    <img src={user.avatarUrl} alt="You" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
+  ) : (
+    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center text-white text-xs sm:text-sm font-bold shrink-0">
+      {(user?.name || user?.email || 'U')[0].toUpperCase()}
+    </div>
+  )}
+  <input
+    type="text"
+    value={commentText}
+    onChange={(e) => setCommentText(e.target.value)}
+    placeholder={user ? 'Add a comment...' : 'Sign in to comment'}
+    disabled={!user}
+    className="flex-1 min-w-0 bg-surface rounded-full px-3 sm:px-4 py-2 text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+  />
+  <button
+    type="submit"
+    disabled={postingComment || !commentText.trim() || !user}
+    className="bg-primary text-white px-3 sm:px-6 py-2 rounded-full text-sm hover:bg-primary-dark disabled:opacity-50 shrink-0"
+  >
+    {postingComment ? '...' : 'Post'}
+  </button>
+</form>
 
             {comments.length === 0 ? (
               <p className="text-text-secondary text-sm">No comments yet. Be the first!</p>
@@ -430,11 +430,11 @@ export default function MediaDetail({ mediaId }) {
         </div>
 
         <div className="lg:col-span-1">
-          <h2 className="text-xl font-bold text-text mb-4">More like this</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {suggestions.map((item) => <SuggestionCard key={item.id} item={item} />)}
-          </div>
-        </div>
+  <h2 className="text-lg sm:text-xl font-bold text-text mb-3 sm:mb-4">More like this</h2>
+  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+    {suggestions.map((item) => <SuggestionCard key={item.id} item={item} />)}
+  </div>
+</div>
       </div>
     </div>
   );

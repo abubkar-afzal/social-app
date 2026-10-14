@@ -16,7 +16,7 @@ export const fetchMediaBatch = async (page, pageSize = 10, type = null) => {
   const res = await authFetch(apiUrl(`/api/media?${params}`));
   const data = await safeJson(res);
   if (!res.ok) throw new Error(data?.error || 'Failed to fetch media');
-
+  console.log(data)
   return (data.media || []).map((item) => ({
     ...item,
     type: item.type.toLowerCase(),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { PlayIcon, PauseIcon, BookmarkIcon, HeartIcon } from '../../icons';
+import { PlayIcon, PauseIcon } from '../../icons';
 import { fetchMediaBatch } from '../../utils/mockData';
 
 const HeroSkeleton = () => (
@@ -25,19 +25,19 @@ const VideoCard = ({ video }) => (
         playsInline
         preload="auto"
       />
-      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/80 to-transparent">
         <div className="flex items-center gap-2 mb-1">
           {video.user?.avatarUrl ? (
-            <img src={video.user.avatarUrl} alt={video.user.name} className="w-6 h-6 rounded-full object-cover" />
+            <img src={video.user.avatarUrl} alt={video.user.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">
               {(video.user?.name || 'U')[0].toUpperCase()}
             </div>
           )}
-          <span className="text-white text-xs truncate">{video.user?.name || 'User'}</span>
+          <span className="text-white text-[10px] sm:text-xs truncate">{video.user?.name || 'User'}</span>
         </div>
-        <h3 className="text-white font-semibold truncate">{video.title}</h3>
-        <p className="text-white/80 text-xs">{video.viewsCount} views</p>
+        <h3 className="text-white text-xs sm:text-sm font-semibold truncate">{video.title}</h3>
+        <p className="text-white/80 text-[10px] sm:text-xs">{video.viewsCount || 0} views</p>
       </div>
     </div>
   </Link>
@@ -47,24 +47,19 @@ const PhotoCard = ({ photo }) => (
   <Link href={`/media/${photo.id}`}>
     <div className="group relative rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
       <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" loading="lazy" />
-      <div className="absolute inset-0 opacity-100 transition-opacity flex flex-col justify-between p-3">
-        <div className="flex justify-end">
-          
+      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="flex items-center gap-2 mb-1">
+          {photo.user?.avatarUrl ? (
+            <img src={photo.user.avatarUrl} alt={photo.user.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
+          ) : (
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">
+              {(photo.user?.name || 'U')[0].toUpperCase()}
+            </div>
+          )}
+          <span className="text-white text-[10px] sm:text-xs truncate">{photo.user?.name || 'User'}</span>
         </div>
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            {photo.user?.avatarUrl ? (
-              <img src={photo.user.avatarUrl} alt={photo.user.name} className="w-6 h-6 rounded-full object-cover" />
-            ) : (
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
-                {(photo.user?.name || 'U')[0].toUpperCase()}
-              </div>
-            )}
-            <span className="text-white text-xs">{photo.user?.name || 'User'}</span>
-          </div>
-          <h3 className="text-white font-semibold truncate">{photo.title}</h3>
-          <p className="text-white/80 text-xs">{photo.viewsCount} views</p>
-        </div>
+        <h3 className="text-white text-xs sm:text-sm font-semibold truncate">{photo.title}</h3>
+        <p className="text-white/80 text-[10px] sm:text-xs">{photo.viewsCount || 0} views</p>
       </div>
     </div>
   </Link>
@@ -89,25 +84,29 @@ const AudioCard = ({ audio }) => {
         <div className="aspect-square flex items-center justify-center">
           <button
             onClick={togglePlay}
-            className="rounded-full bg-white/20 p-5 hover:bg-white/30 transition group-hover:scale-110"
+            className="rounded-full bg-white/20 p-3 sm:p-5 hover:bg-white/30 transition group-hover:scale-110"
           >
-            {isPlaying ? <PauseIcon className="h-12 w-12 text-white" /> : <PlayIcon className="h-12 w-12 text-white" />}
+            {isPlaying ? (
+              <PauseIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
+            ) : (
+              <PlayIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
+            )}
           </button>
           <audio ref={audioRef} src={audio.src} className="hidden" onEnded={() => setIsPlaying(false)} />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/70 to-transparent">
           <div className="flex items-center gap-2 mb-1">
             {audio.user?.avatarUrl ? (
-              <img src={audio.user.avatarUrl} alt={audio.user.name} className="w-6 h-6 rounded-full object-cover" />
+              <img src={audio.user.avatarUrl} alt={audio.user.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">
                 {(audio.user?.name || 'U')[0].toUpperCase()}
               </div>
             )}
-            <span className="text-white text-xs">{audio.user?.name || 'User'}</span>
+            <span className="text-white text-[10px] sm:text-xs truncate">{audio.user?.name || 'User'}</span>
           </div>
-          <h3 className="text-white font-semibold truncate">{audio.title}</h3>
-          <p className="text-white/80 text-xs">{audio.viewsCount} views</p>
+          <h3 className="text-white text-xs sm:text-sm font-semibold truncate">{audio.title}</h3>
+          <p className="text-white/80 text-[10px] sm:text-xs">{audio.viewsCount || 0} views</p>
         </div>
       </div>
     </Link>
@@ -155,20 +154,24 @@ export default function Hero() {
   const filteredItems = activeFilter === 'all' ? heroItems : heroItems.filter((item) => item.type === activeFilter);
 
   return (
-    <section className="bg-background py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">Discover, Share & Inspire</h1>
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+    <section className="bg-background py-6 sm:py-8">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text mb-2 sm:mb-4 px-2">
+            Discover, Share & Inspire
+          </h1>
+          <p className="text-sm sm:text-lg text-text-secondary max-w-2xl mx-auto px-2">
             Explore a world of videos, photos, and audio curated by people like you.
           </p>
         </div>
-        <div className="flex justify-center gap-2 mb-8">
+
+        {/* Filters - horizontally scrollable on mobile */}
+        <div className="flex justify-start sm:justify-center gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
           {['all', 'video', 'photo', 'audio'].map((f) => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`px-6 py-2 rounded-full font-medium transition ${
+              className={`px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition whitespace-nowrap shrink-0 ${
                 activeFilter === f
                   ? 'bg-primary text-white'
                   : 'bg-surface text-text hover:bg-background border border-border'
@@ -178,13 +181,26 @@ export default function Hero() {
             </button>
           ))}
         </div>
+
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(8)].map((_, i) => <HeroSkeleton key={i} />)}
           </div>
         ) : (
           <>
-            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            {/* Mobile: 2-column grid; Desktop: masonry */}
+            <div className="grid grid-cols-2 md:hidden gap-3">
+              {filteredItems.map((item) => (
+                <div key={item.id} className="aspect-square">
+                  {item.type === 'video' && <VideoCard video={item} />}
+                  {item.type === 'photo' && <PhotoCard photo={item} />}
+                  {item.type === 'audio' && <AudioCard audio={item} />}
+                </div>
+              ))}
+            </div>
+
+            {/* Tablet and up: masonry */}
+            <div className="hidden md:block columns-3 lg:columns-4 gap-4 space-y-4">
               {filteredItems.map((item, index) => (
                 <div
                   key={item.id}
@@ -204,6 +220,7 @@ export default function Hero() {
                 </div>
               ))}
             </div>
+
             <div ref={sentinelRef} className="h-10" />
             {hasMore && (
               <div className="flex justify-center py-4">

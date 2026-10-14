@@ -58,7 +58,7 @@ export default function FavoritesGrid() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
+<div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
         <BookmarkIcon className="h-16 w-16 mx-auto text-text-secondary mb-4" />
         <h1 className="text-2xl font-bold text-text mb-4">Your Favorites</h1>
         <p className="text-text-secondary mb-6">Sign in to view and manage your favorite posts.</p>
@@ -76,7 +76,7 @@ export default function FavoritesGrid() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-text">Favorites</h1>
+<h1 className="text-2xl sm:text-3xl font-bold text-text">Favorites</h1>
           <p className="text-text-secondary mt-1">
             {items.length} {items.length === 1 ? 'post' : 'posts'} saved
           </p>
@@ -84,7 +84,7 @@ export default function FavoritesGrid() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="rounded-lg overflow-hidden bg-surface shadow-sm">
               <div className="aspect-square bg-border animate-pulse" />

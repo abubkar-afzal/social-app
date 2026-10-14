@@ -16,25 +16,21 @@ const SkeletonCard = () => (
   </div>
 );
 
-const VideoPlayer = ({ src }) => {
-  const videoRef = useRef(null);
-  return (
-    <video
-      ref={videoRef}
-      src={src}
-      className="w-full h-full object-cover"
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      onMouseEnter={(e) => e.target.play()}
-      onMouseLeave={(e) => {
-        e.target.pause();
-        e.target.currentTime = 0;
-      }}
-    />
-  );
-};
+const VideoPlayer = ({ src }) => (
+  <video
+    src={src}
+    className="w-full h-full object-cover"
+    muted
+    loop
+    playsInline
+    preload="metadata"
+    onMouseEnter={(e) => e.target.play()}
+    onMouseLeave={(e) => {
+      e.target.pause();
+      e.target.currentTime = 0;
+    }}
+  />
+);
 
 const AudioPlayer = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -51,14 +47,11 @@ const AudioPlayer = ({ src }) => {
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-      <button
-        onClick={togglePlay}
-        className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
-      >
+      <button onClick={togglePlay} className="rounded-full bg-white/20 p-3 sm:p-4 hover:bg-white/30 transition">
         {isPlaying ? (
-          <PauseIcon className="h-12 w-12 text-white" />
+          <PauseIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
         ) : (
-          <PlayIcon className="h-12 w-12 text-white" />
+          <PlayIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
         )}
       </button>
       <audio ref={audioRef} src={src} className="hidden" onEnded={() => setIsPlaying(false)} />
@@ -82,44 +75,37 @@ export const MediaCardItem = ({ media }) => {
           )}
         </div>
 
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
-          <div className="flex justify-end">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                setIsSaved(!isSaved);
-              }}
-              className={`rounded-full p-2 ${isSaved ? 'bg-primary text-white' : 'bg-white/90 text-text hover:bg-white'}`}
-            >
-              <BookmarkIcon className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="flex justify-between items-end">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                {media.user?.avatarUrl ? (
-  <img src={media.user.avatarUrl} alt={media.user.name || 'User'} className="w-6 h-6 rounded-full object-cover" />
-) : (
-  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
-    {(media.user?.name || media.user?.email || 'U')[0].toUpperCase()}
-  </div>
-)}
-<span className="text-white text-xs truncate">
-  {media.user?.name || media.user?.email?.split('@')[0] || 'User'}
-</span>
+        {/* Always visible info on mobile, hover-only on desktop */}
+        <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="flex items-center gap-2 mb-1">
+            {media.user?.avatarUrl ? (
+              <img src={media.user.avatarUrl} alt={media.user.name || 'User'} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
+            ) : (
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">
+                {(media.user?.name || media.user?.email || 'U')[0].toUpperCase()}
               </div>
-              <span className="text-white text-sm font-medium truncate block">{media.title}</span>
-              <span className="text-white/70 text-xs">
-                {media.viewsCount} views · {media.likesCount} likes
-              </span>
-            </div>
-            <button
-              onClick={(e) => e.preventDefault()}
-              className="rounded-full bg-primary p-2 text-white hover:bg-primary-dark ml-2"
-            >
-              <PlusIcon className="h-5 w-5" />
-            </button>
+            )}
+            <span className="text-white text-[10px] sm:text-xs truncate">
+              {media.user?.name || media.user?.email?.split('@')[0] || 'User'}
+            </span>
           </div>
+          <span className="text-white text-xs sm:text-sm font-medium truncate block">{media.title}</span>
+          <span className="text-white/70 text-[10px] sm:text-xs">
+            {media.viewsCount || 0} views · {media.likesCount || 0} likes
+          </span>
+        </div>
+
+        {/* Hover actions — desktop only */}
+        <div className="hidden sm:flex absolute top-2 right-2 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsSaved(!isSaved);
+            }}
+            className={`rounded-full p-2 ${isSaved ? 'bg-primary text-white' : 'bg-white/90 text-text hover:bg-white'}`}
+          >
+            <BookmarkIcon className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </Link>
@@ -169,14 +155,14 @@ export default function MediaCardGrid() {
   }, [loadMore, hasMore]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {mediaItems.map((item) => <MediaCardItem key={item.id} media={item} />)}
           </div>
           <div ref={sentinelRef} className="h-10" />

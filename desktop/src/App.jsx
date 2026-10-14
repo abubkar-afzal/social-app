@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 import DesktopNavbar from '../../packages/ui/src/components/desktop/Navbar';
 import DesktopHero from '../../packages/ui/src/components/desktop/Hero';
@@ -39,7 +39,6 @@ export default function App() {
             <Route path="/uploadmedia" element={<DesktopUploadMedia />} />
             <Route path="/favorites" element={<DesktopFavoritesGrid />} />
 
-            {/* Info pages */}
             <Route path="/about" element={<DesktopAboutPage />} />
             <Route path="/careers" element={<DesktopCareersPage />} />
             <Route path="/press" element={<DesktopPressPage />} />

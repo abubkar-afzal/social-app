@@ -40,6 +40,7 @@ export {
   FireIcon as TrendingIcon,
   ClockIcon as RecentIcon,
   TagIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 
 // Solid icons

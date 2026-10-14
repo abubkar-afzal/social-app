@@ -281,7 +281,10 @@ export default function MobileAccount() {
     );
   }
 
-  const filteredMedia = filter === 'all' ? media : media.filter((m) => m.type.toLowerCase() === filter);
+  const filteredMedia =
+  filter === 'all'
+    ? media
+    : media.filter((m) => (m.type || '').toLowerCase() === filter);
   const stats = {
     total: media.length,
     videos: media.filter((m) => m.type === 'VIDEO').length,

@@ -277,110 +277,110 @@ const handleAvatarCropDone = ({ blob, previewUrl }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <div className="bg-surface rounded-2xl shadow-md p-6 md:p-8 mb-8">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          {user.avatarUrl ? (
-            <img
-              src={user.avatarUrl}
-              alt={user.name || 'User'}
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary"
-              onError={(e) => { e.target.src = 'https://i.pravatar.cc/150?img=1'; }}
-            />
-          ) : (
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary flex items-center justify-center text-white text-4xl font-bold">
-              {(user.name || 'U')[0].toUpperCase()}
-            </div>
-          )}
+    // Replace container:
+<div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
 
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-bold text-text">{user.name || 'User'}</h1>
-            <p className="text-text-secondary mt-1">{user.email}</p>
-            {user.bio && <p className="text-text-secondary mt-2">{user.bio}</p>}
-
-            <div className="flex justify-center md:justify-start gap-6 mt-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-text">{stats.total}</p>
-                <p className="text-sm text-text-secondary">Posts</p>
-              </div>
-              <button onClick={() => setActiveTab('followers')} className="text-center">
-                <p className="text-2xl font-bold text-text">{followers.length}</p>
-                <p className="text-sm text-text-secondary">Followers</p>
-              </button>
-              <button onClick={() => setActiveTab('following')} className="text-center">
-                <p className="text-2xl font-bold text-text">{following.length}</p>
-                <p className="text-sm text-text-secondary">Following</p>
-              </button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 w-full md:w-auto">
-            <button
-              onClick={openEdit}
-              className="bg-surface border border-primary text-primary px-6 py-2 rounded-full hover:bg-primary hover:text-white transition flex items-center justify-center gap-2"
-            >
-              <EditIcon className="h-5 w-5" /> Edit Profile
-            </button>
-            <Link
-              href="/uploadmedia"
-              className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition flex items-center justify-center gap-2"
-            >
-              <PlusIcon className="h-5 w-5" /> Create Post
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-surface border border-error text-error px-6 py-2 rounded-full hover:bg-error hover:text-white transition flex items-center justify-center gap-2"
-            >
-              <LogoutIcon className="h-5 w-5" /> Sign Out
-            </button>
-          </div>
-        </div>
+<div className="bg-surface rounded-2xl shadow-md p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+    {user.avatarUrl ? (
+      <img
+        src={user.avatarUrl}
+        alt={user.name || 'User'}
+        className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-primary shrink-0"
+        onError={(e) => { e.target.src = 'https://i.pravatar.cc/150?img=1'; }}
+      />
+    ) : (
+      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full bg-primary flex items-center justify-center text-white text-3xl sm:text-4xl font-bold shrink-0">
+        {(user.name || 'U')[0].toUpperCase()}
       </div>
+    )}
+
+    <div className="flex-1 text-center sm:text-left min-w-0">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-text truncate">{user.name || 'User'}</h1>
+      <p className="text-text-secondary text-sm mt-1 truncate">{user.email}</p>
+      {user.bio && <p className="text-text-secondary text-sm mt-2">{user.bio}</p>}
+
+      <div className="flex justify-center sm:justify-start gap-4 sm:gap-6 mt-3 sm:mt-4">
+        <div className="text-center">
+          <p className="text-lg sm:text-2xl font-bold text-text">{stats.total}</p>
+          <p className="text-xs sm:text-sm text-text-secondary">Posts</p>
+        </div>
+        <button onClick={() => setActiveTab('followers')} className="text-center">
+          <p className="text-lg sm:text-2xl font-bold text-text">{followers.length}</p>
+          <p className="text-xs sm:text-sm text-text-secondary">Followers</p>
+        </button>
+        <button onClick={() => setActiveTab('following')} className="text-center">
+          <p className="text-lg sm:text-2xl font-bold text-text">{following.length}</p>
+          <p className="text-xs sm:text-sm text-text-secondary">Following</p>
+        </button>
+      </div>
+    </div>
+
+    <div className="flex flex-col sm:flex-col gap-2 w-full sm:w-auto">
+      <button
+        onClick={openEdit}
+        className="bg-surface border border-primary text-primary px-4 sm:px-6 py-2 rounded-full hover:bg-primary hover:text-white transition flex items-center justify-center gap-2 text-sm"
+      >
+        <EditIcon className="h-4 w-4" /> Edit Profile
+      </button>
+      <Link
+        href="/uploadmedia"
+        className="bg-primary text-white px-4 sm:px-6 py-2 rounded-full hover:bg-primary-dark transition flex items-center justify-center gap-2 text-sm"
+      >
+        <PlusIcon className="h-4 w-4" /> Create Post
+      </Link>
+      <button
+        onClick={handleLogout}
+        className="bg-surface border border-error text-error px-4 sm:px-6 py-2 rounded-full hover:bg-error hover:text-white transition flex items-center justify-center gap-2 text-sm"
+      >
+        <LogoutIcon className="h-4 w-4" /> Sign Out
+      </button>
+    </div>
+  </div>
+</div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-border">
-        {[
-          { key: 'posts', label: 'Posts' },
-          { key: 'followers', label: 'Followers' },
-          { key: 'following', label: 'Following' },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-3 font-medium transition border-b-2 -mb-px ${
-              activeTab === tab.key
-                ? 'border-primary text-primary'
-                : 'border-transparent text-text-secondary hover:text-text'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <div className="flex gap-1 sm:gap-2 mb-4 sm:mb-6 border-b border-border overflow-x-auto">
+  {[
+    { key: 'posts', label: 'Posts' },
+    { key: 'followers', label: 'Followers' },
+    { key: 'following', label: 'Following' },
+  ].map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => setActiveTab(tab.key)}
+      className={`px-3 sm:px-5 py-3 text-sm font-medium transition border-b-2 -mb-px whitespace-nowrap ${
+        activeTab === tab.key
+          ? 'border-primary text-primary'
+          : 'border-transparent text-text-secondary hover:text-text'
+      }`}
+    >
+      {tab.label}
+    </button>
+  ))}
+</div>
 
       {/* POSTS TAB */}
       {activeTab === 'posts' && (
         <>
-          <div className="flex gap-2 mb-6 overflow-x-auto">
-            {[
-              { key: 'all', label: 'All' },
-              { key: 'video', label: '🎬 Videos' },
-              { key: 'photo', label: '🖼️ Photos' },
-              { key: 'audio', label: '🎵 Audio' },
-            ].map((f) => (
-              <button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
-                className={`px-5 py-2 rounded-full whitespace-nowrap transition ${
-                  filter === f.key ? 'bg-primary text-white' : 'bg-surface text-text border border-border hover:bg-background'
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-
+          <div className="flex gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
+  {[
+    { key: 'all', label: 'All' },
+    { key: 'video', label: '🎬 Videos' },
+    { key: 'photo', label: '🖼️ Photos' },
+    { key: 'audio', label: '🎵 Audio' },
+  ].map((f) => (
+    <button
+      key={f.key}
+      onClick={() => setFilter(f.key)}
+      className={`px-4 sm:px-5 py-2 rounded-full text-sm whitespace-nowrap shrink-0 transition ${
+        filter === f.key ? 'bg-primary text-white' : 'bg-surface text-text border border-border hover:bg-background'
+      }`}
+    >
+      {f.label}
+    </button>
+  ))}
+</div>
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
@@ -466,11 +466,9 @@ const handleAvatarCropDone = ({ blob, previewUrl }) => {
           ) : followers.length === 0 ? (
             <div className="text-center py-20 bg-surface rounded-2xl text-text-secondary">No followers yet.</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {followers.map((u) => (
-                <UserCard key={u.id} user={u} />
-              ))}
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {followers.map((u) => <UserCard key={u.id} user={u} />)}
+</div>
           )}
         </>
       )}

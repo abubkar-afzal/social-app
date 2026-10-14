@@ -51,7 +51,8 @@ export default async function handler(req, res) {
       });
 
       // Public image URL for <img src>
-      const avatarUrl = `https://drive.google.com/thumbnail?id=${driveFile.id}&sz=w400`;
+      const avatarUrl = `https://lh3.googleusercontent.com/d/${driveFile.id}`;
+
 
       // Update user
       const updatedUser = await prisma.user.update({

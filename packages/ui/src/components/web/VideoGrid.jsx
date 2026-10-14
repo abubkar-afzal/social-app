@@ -36,9 +36,9 @@ export default function VideoGrid() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Videos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Videos</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {videos.map((video) => (
           <Link href={`/media/${video.id}`} key={video.id}>
             <div className="rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-lg transition-shadow cursor-pointer">
@@ -51,9 +51,19 @@ export default function VideoGrid() {
                 playsInline
                 preload="auto"
               />
-              <div className="p-4">
-                <h3 className="font-semibold truncate">{video.title}</h3>
-                <p className="text-sm text-text-secondary">{video.views} views</p>
+              <div className="p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  {video.user?.avatarUrl ? (
+                    <img src={video.user.avatarUrl} alt={video.user.name} className="w-6 h-6 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+                      {(video.user?.name || 'U')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-xs text-text-secondary truncate">{video.user?.name || 'User'}</span>
+                </div>
+                <h3 className="font-semibold text-sm sm:text-base truncate">{video.title}</h3>
+                <p className="text-xs sm:text-sm text-text-secondary">{video.viewsCount || 0} views</p>
               </div>
             </div>
           </Link>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,10 +7,7 @@ const isDev = process.env.ELECTRON_START_URL === 'http://localhost:5173';
 
 let mainWindow;
 
-/* -------------------------------------------------------------------------- */
-/*                    REGISTER CUSTOM PROTOCOL (must be early)                 */
-/* -------------------------------------------------------------------------- */
-
+/* ------------------------- Protocol registration ------------------------- */
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
     app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [
@@ -21,15 +18,11 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient(PROTOCOL);
 }
 
-/* -------------------------------------------------------------------------- */
-/*                           DEEP LINK HANDLING                                */
-/* -------------------------------------------------------------------------- */
-
+/* ---------------------------- Deep link handling -------------------------- */
 function extractToken(url) {
   try {
-    const parsed = new URL(url);
-    return parsed.searchParams.get('token');
-  } catch (e) {
+    return new URL(url).searchParams.get('token');
+  } catch {
     return null;
   }
 }
@@ -54,7 +47,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on('second-instance', (event, commandLine) => {
+  app.on('second-instance', (_event, commandLine) => {
     const url = commandLine.find((arg) => arg.startsWith(`${PROTOCOL}://`));
     if (url) handleDeepLink(url);
     if (mainWindow) {
@@ -64,10 +57,21 @@ if (!gotTheLock) {
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                 WINDOW                                      */
-/* -------------------------------------------------------------------------- */
+/* -------------------------------- IPC ------------------------------------- */
+ipcMain.handle('open-external', async (_event, url) => {
+  try {
+    if (typeof url === 'string' && /^https?:\/\//i.test(url)) {
+      await shell.openExternal(url);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('open-external failed:', e);
+    return false;
+  }
+});
 
+/* ------------------------------- Window ----------------------------------- */
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -83,32 +87,19 @@ function createWindow() {
   const distPath = path.join(__dirname, '../dist/index.html');
   const hasDist = fs.existsSync(distPath);
 
-  // Decision logic:
-  // 1. If packaged → always load from dist
-  // 2. If dev mode explicitly requested (ELECTRON_START_URL) → load from Vite
-  // 3. If dist exists → load from dist (production preview without packaging)
-  // 4. Otherwise → warn and load dist path anyway (will show error page)
   if (app.isPackaged) {
-    console.log('📦 Packaged mode: loading dist/index.html');
     mainWindow.loadFile(distPath);
   } else if (isDev) {
-    console.log('🛠️  Dev mode: loading http://localhost:5173');
     mainWindow.loadURL('http://localhost:5173');
   } else if (hasDist) {
-    console.log('📂 Production preview: loading dist/index.html');
     mainWindow.loadFile(distPath);
   } else {
-    console.error('❌ Neither dev URL nor dist/index.html available.');
-    console.error('   Run "npm run build" first, or start Vite and set ELECTRON_START_URL.');
-    mainWindow.loadFile(distPath); // will show error page, but at least it opens
+    console.error('No dev URL or dist available.');
+    mainWindow.loadFile(distPath);
   }
 
-  mainWindow.webContents.on('did-fail-load', (e, code, desc, url) => {
-    console.error('❌ Failed to load:', url, '| Code:', code, '| Reason:', desc);
-  });
-
-  mainWindow.webContents.on('did-finish-load', () => {
-    console.log('✅ Page loaded successfully');
+  mainWindow.webContents.on('did-fail-load', (_e, code, desc, url) => {
+    console.error('Failed to load:', url, '| Code:', code, '| Reason:', desc);
   });
 }
 
@@ -123,7 +114,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// Windows/Linux: cold-start deep link
 if (process.platform !== 'darwin' && process.argv.length >= 2) {
   const url = process.argv.find((arg) => arg.startsWith(`${PROTOCOL}://`));
   if (url) {

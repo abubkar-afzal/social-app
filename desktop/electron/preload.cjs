@@ -1,16 +1,18 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  /**
+   * Listen for the OAuth token that arrives via the armedia:// deep link.
+   * The handler receives just the token string.
+   */
   onOAuthToken: (handler) => {
-    ipcRenderer.on('oauth-token', (event, token) => handler(token));
+    ipcRenderer.removeAllListeners('oauth-token');
+    ipcRenderer.on('oauth-token', (_event, token) => handler(token));
   },
-  openExternal: (url) => ipcRenderer.invoke('open-external', url),
-});
 
-// IPC handler for opening URLs in the system browser
-const { ipcMain } = require('electron');
-ipcMain.handle('open-external', async (event, url) => {
-  const { shell } = require('electron');
-  await shell.openExternal(url);
-  return true;
+  /**
+   * Open a URL in the user's default browser.
+   * The main process handles the actual shell.openExternal call.
+   */
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
 });

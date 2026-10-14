@@ -9,7 +9,7 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 36) / 2;
 
 const SkeletonCard = () => (
-  <View className="bg-surface rounded-xl overflow-hidden mb-3 shadow-md">
+  <View className="bg-surface rounded-xl overflow-hidden shadow-md" style={{ width: CARD_WIDTH }}>
     <View className="aspect-square bg-border animate-pulse" />
     <View className="p-3">
       <View className="h-4 bg-border rounded mb-2 animate-pulse" />
@@ -39,7 +39,7 @@ const AudioPlayer = ({ src, color }) => {
     setIsPlaying(!isPlaying);
   };
   return (
-    <View className="w-full h-full items-center justify-center" style={{ backgroundColor: color }}>
+    <View className="w-full h-full items-center justify-center" style={{ backgroundColor: color || '#e6005c' }}>
       <TouchableOpacity onPress={togglePlay} className="rounded-full bg-white/20 p-4">
         <Text className="text-4xl text-white">{isPlaying ? '⏸️' : '▶️'}</Text>
       </TouchableOpacity>
@@ -58,7 +58,7 @@ export const MobileMediaCardItem = ({ media }) => {
       onPress={onPress}
       activeOpacity={0.85}
     >
-      <View className="aspect-square">
+      <View className="aspect-square" style={{ position: 'relative' }}>
         {media.type === 'video' ? (
           <VideoPlayer src={media.src} />
         ) : media.type === 'audio' ? (
@@ -66,7 +66,16 @@ export const MobileMediaCardItem = ({ media }) => {
         ) : (
           <Image source={{ uri: media.src }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
         )}
+
+        {media.type === 'video' && (
+          <View className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
+            <Text className="text-white text-xs font-medium" numberOfLines={1}>
+              {media.title}
+            </Text>
+          </View>
+        )}
       </View>
+
       <View className="p-3">
         <View className="flex-row items-center gap-2 mb-2">
           {media.user?.avatarUrl ? (
@@ -76,7 +85,9 @@ export const MobileMediaCardItem = ({ media }) => {
               <Text className="text-white text-xs font-bold">{(media.user?.name || 'U')[0].toUpperCase()}</Text>
             </View>
           )}
-          <Text className="text-xs text-text-secondary flex-1" numberOfLines={1}>{media.user?.name || 'User'}</Text>
+          <Text className="text-xs text-text-secondary flex-1" numberOfLines={1}>
+            {media.user?.name || 'User'}
+          </Text>
         </View>
         <Text className="text-base font-semibold text-text mb-2" numberOfLines={1}>{media.title}</Text>
         <View className="flex-row justify-between items-center">
@@ -152,7 +163,9 @@ export default function MobileMediaCard({ initialItems = [] }) {
       onEndReachedThreshold={0.5}
       onRefresh={onRefresh}
       refreshing={refreshing}
-      ListFooterComponent={loading ? <View className="py-4"><ActivityIndicator size="large" color="#e6005c" /></View> : null}
+      ListFooterComponent={loading ? (
+        <View className="py-4"><ActivityIndicator size="large" color="#e6005c" /></View>
+      ) : null}
     />
   );
 }

@@ -41,42 +41,35 @@ export default function AudioGrid() {
   const togglePlay = (e, audioId) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (playingId === audioId) {
       const current = audioRefs.current[audioId];
-      if (current) {
-        current.pause();
-      }
+      if (current) current.pause();
       setPlayingId(null);
     } else {
-      // pause previous
       if (playingId) {
         const prev = audioRefs.current[playingId];
-        if (prev) {
-          prev.pause();
-        }
+        if (prev) prev.pause();
       }
       setPlayingId(audioId);
-      // audio element will autoPlay due to conditional rendering
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Audio</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Audio</h1>
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {audios.map((audio) => (
           <Link href={`/media/${audio.id}`} key={audio.id}>
             <div className="rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-lg transition-shadow cursor-pointer">
               <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
                 <button
                   onClick={(e) => togglePlay(e, audio.id)}
-                  className="rounded-full bg-white/20 p-4 hover:bg-white/30 transition"
+                  className="rounded-full bg-white/20 p-3 sm:p-4 hover:bg-white/30 transition"
                 >
                   {playingId === audio.id ? (
-                    <PauseIcon className="h-12 w-12 text-white" />
+                    <PauseIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
                   ) : (
-                    <PlayIcon className="h-12 w-12 text-white" />
+                    <PlayIcon className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
                   )}
                 </button>
                 {playingId === audio.id && (
@@ -89,9 +82,19 @@ export default function AudioGrid() {
                   />
                 )}
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold truncate">{audio.title}</h3>
-                <p className="text-sm text-text-secondary">{audio.views} views</p>
+              <div className="p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  {audio.user?.avatarUrl ? (
+                    <img src={audio.user.avatarUrl} alt={audio.user.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">
+                      {(audio.user?.name || 'U')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-[10px] sm:text-xs text-text-secondary truncate">{audio.user?.name || 'User'}</span>
+                </div>
+                <h3 className="font-semibold text-sm sm:text-base truncate">{audio.title}</h3>
+                <p className="text-xs sm:text-sm text-text-secondary">{audio.viewsCount || 0} views</p>
               </div>
             </div>
           </Link>

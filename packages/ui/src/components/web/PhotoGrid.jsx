@@ -16,9 +16,7 @@ export default function PhotoGrid() {
     if (!sentinelRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          loadPhotos(page);
-        }
+        if (entries[0].isIntersecting) loadPhotos(page);
       },
       { threshold: 0.1 }
     );
@@ -38,16 +36,26 @@ export default function PhotoGrid() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Photos</h1>
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Photos</h1>
+      <div className="columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
         {photos.map((photo) => (
           <Link href={`/media/${photo.id}`} key={photo.id}>
             <div className="break-inside-avoid rounded-lg overflow-hidden bg-surface shadow-md hover:shadow-lg transition-shadow cursor-pointer">
               <img src={photo.src} alt={photo.title} className="w-full object-cover" loading="lazy" />
-              <div className="p-3">
-                <h3 className="font-semibold truncate text-sm">{photo.title}</h3>
-                <p className="text-xs text-text-secondary">{photo.views} views</p>
+              <div className="p-2 sm:p-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                  {photo.user?.avatarUrl ? (
+                    <img src={photo.user.avatarUrl} alt={photo.user.name} className="w-5 h-5 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold">
+                      {(photo.user?.name || 'U')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-[10px] sm:text-xs text-text-secondary truncate">{photo.user?.name || 'User'}</span>
+                </div>
+                <h3 className="font-semibold truncate text-xs sm:text-sm">{photo.title}</h3>
+                <p className="text-[10px] sm:text-xs text-text-secondary">{photo.viewsCount || 0} views</p>
               </div>
             </div>
           </Link>

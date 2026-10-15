@@ -1,9 +1,12 @@
 /* packages/ui/src/styles/theme.css */
 :root {
   /* Primary brand colors */
-  --color-primary: #3de600;
+  --color-primary: #e6005c;
   --color-primary-light: #ff6b9d;
   --color-primary-dark: #a60042;
+  --color-primary-rgb: 230 0 92;
+  --color-primary-light-rgb: 255 107 157;
+  --color-primary-dark-rgb: 166 0 66;
 
   /* Neutral palette */
   --color-background: #f8f9fa;
@@ -11,16 +14,24 @@
   --color-text: #1a1a1a;
   --color-text-secondary: #6b7280;
   --color-border: #e5e7eb;
+  --color-background-rgb: 248 249 250;
+  --color-surface-rgb: 255 255 255;
+  --color-text-rgb: 26 26 26;
+  --color-text-secondary-rgb: 107 114 128;
+  --color-border-rgb: 229 231 235;
 
   /* Semantic colors */
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
+  --color-success-rgb: 16 185 129;
+  --color-warning-rgb: 245 158 11;
+  --color-error-rgb: 239 68 68;
 
   /* Typography */
   --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  /* Spacing & radius (optional) */
+  /* Spacing & radius */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 1rem;

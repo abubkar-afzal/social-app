@@ -21,6 +21,7 @@ import DesktopHelpPage from '../../packages/ui/src/components/desktop/HelpPage';
 import DesktopGuidelinesPage from '../../packages/ui/src/components/desktop/GuidelinesPage';
 import DesktopPrivacyPage from '../../packages/ui/src/components/desktop/PrivacyPage';
 import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage';
+import DesktopSettingsPage from '../../packages/ui/src/components/desktop/SettingsPage';
 
 export default function App() {
   return (
@@ -44,7 +45,8 @@ export default function App() {
             <Route path="/press" element={<DesktopPressPage />} />
             <Route path="/blog" element={<DesktopBlogPage />} />
             <Route path="/help" element={<DesktopHelpPage />} />
-            <Route path="/guidelines" element={<DesktopGuidelinesPage />} />
+            <Route path="/guidelines" element={<DesktopGuidelinesPage />} /><Route path="/settings" element={<DesktopSettingsPage />} />
+
             <Route path="/privacy" element={<DesktopPrivacyPage />} />
             <Route path="/terms" element={<DesktopTermsPage />} />
           </Routes>

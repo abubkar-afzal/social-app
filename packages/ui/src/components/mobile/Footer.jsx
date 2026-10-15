@@ -23,6 +23,8 @@ export default function MobileFooter({ state, descriptors, navigation }) {
     { label: 'Guidelines', screen: 'Guidelines' },
     { label: 'Privacy Policy', screen: 'Privacy' },
     { label: 'Terms of Service', screen: 'Terms' },
+    { label: 'Settings', screen: 'Settings' },
+
   ];
 
   const tabs = [

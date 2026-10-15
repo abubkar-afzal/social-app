@@ -1,11 +1,14 @@
-import './config';                    // ← MUST be first
+import './config';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from '../../packages/ui/src/utils/ThemeContext';
 import './styles/globals.css';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );

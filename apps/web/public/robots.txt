@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /account
+Disallow: /settings
+Disallow: /uploadmedia
+Disallow: /favorites
+Disallow: /login
+Disallow: /api/
+
+Sitemap: https://ar-media-sigma.vercel.app/sitemap.xml

@@ -28,6 +28,8 @@ import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
 import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
 import PrivacyScreen from '../../packages/ui/src/components/mobile/PrivacyScreen';
 import TermsScreen from '../../packages/ui/src/components/mobile/TermsScreen';
+import { ThemeProvider } from '../../packages/ui/src/utils/ThemeContext';
+import SettingsScreen from '../../packages/ui/src/components/mobile/SettingsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -222,6 +224,8 @@ export default function App() {
   }, []);
 
   return (
+        <ThemeProvider>
+
     <NavigationContainer>
       <StatusBar style="light" hidden={true} />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -242,7 +246,11 @@ export default function App() {
         <Stack.Screen name="Guidelines" component={GuidelinesPage} />
         <Stack.Screen name="Privacy" component={PrivacyPage} />
         <Stack.Screen name="Terms" component={TermsPage} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
+        </ThemeProvider>
+
   );
 }

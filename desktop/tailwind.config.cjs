@@ -1,38 +1,41 @@
+// desktop/tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-  './index.html',
-  './src/**/*.{js,jsx,ts,tsx}',
-  '../packages/ui/src/**/*.{js,jsx,ts,tsx}',
-  '../packages/ui/src/components/desktop/**/*.{js,jsx,ts,tsx}',
-],
+    './index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+    '../packages/ui/src/components/desktop/**/*.{js,jsx,ts,tsx}',
+    '../packages/ui/src/components/Avatar.jsx',
+    '../packages/ui/src/utils/**/*.{js,jsx,ts,tsx}',
+  ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#e6005c',
-          light: '#ff6b9d',
-          dark: '#a60042',
+          DEFAULT: 'rgb(var(--color-primary-rgb) / <alpha-value>)',
+          light: 'rgb(var(--color-primary-light-rgb) / <alpha-value>)',
+          dark: 'rgb(var(--color-primary-dark-rgb) / <alpha-value>)',
         },
-        background: '#f8f9fa',
-        surface: '#ffffff',
+        background: 'rgb(var(--color-background-rgb) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface-rgb) / <alpha-value>)',
         text: {
-          DEFAULT: '#1a1a1a',
-          secondary: '#6b7280',
+          DEFAULT: 'rgb(var(--color-text-rgb) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary-rgb) / <alpha-value>)',
         },
-        border: '#e5e7eb',
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
+        border: 'rgb(var(--color-border-rgb) / <alpha-value>)',
+        success: 'rgb(var(--color-success-rgb) / <alpha-value>)',
+        warning: 'rgb(var(--color-warning-rgb) / <alpha-value>)',
+        error: 'rgb(var(--color-error-rgb) / <alpha-value>)',
       },
       fontFamily: {
-        base: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        base: 'var(--font-family-base)',
       },
       borderRadius: {
-        sm: '0.25rem',
-        md: '0.5rem',
-        lg: '1rem',
-        full: '9999px',
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        full: 'var(--radius-full)',
       },
     },
   },

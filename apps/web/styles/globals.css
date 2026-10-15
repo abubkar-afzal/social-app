@@ -1,48 +1,45 @@
+/* apps/web/styles/globals.css */
 @import '../../../packages/ui/src/styles/theme.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base page styling — follows theme variables */
+html,
 body {
-  background: var(--foreground);
-  color: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background, #f8f9fa);
+  color: var(--color-text, #1a1a1a);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+html.dark {
+  color-scheme: dark;
+}
 
-/* Smooth scrolling */
+/* Mobile-safe helpers */
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
 
-/* Prevent horizontal overflow */
 body {
   overflow-x: hidden;
 }
 
-/* Hide scrollbars on horizontal scroll areas */
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+/* Hide scrollbars on horizontal scroll areas (mobile filter pills) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-/* Improve touch targets */
+/* Better touch targets */
 @media (max-width: 640px) {
-  button, a {
+  button,
+  a {
     -webkit-tap-highlight-color: transparent;
   }
 }

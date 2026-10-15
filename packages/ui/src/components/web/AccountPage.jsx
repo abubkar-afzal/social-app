@@ -431,13 +431,13 @@ const handleAvatarCropDone = ({ blob, previewUrl }) => {
                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => openMediaEdit(item)}
-                      className="rounded-full bg-white/90 p-2 hover:bg-primary hover:text-white"
+                      className="rounded-full bg-white/90 p-2 hover:bg-primary hover:text-white text-black"
                     >
                       <EditIcon className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => confirmDelete(item)}
-                      className="rounded-full bg-white/90 p-2 hover:bg-error hover:text-white"
+                      className="rounded-full bg-white/90 p-2 hover:bg-error hover:text-white text-black"
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>

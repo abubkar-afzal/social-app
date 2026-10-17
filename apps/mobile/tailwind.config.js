@@ -9,27 +9,25 @@ module.exports = {
     '../../packages/ui/src/utils/**/*.{js,jsx,ts,tsx}',
   ],
   presets: [require('nativewind/preset')],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Static fallback palette.
-        // Dynamic theming on mobile uses useTheme() → style={{ color }} at runtime.
         primary: {
-          DEFAULT: '#e6005c',
-          light: '#ff6b9d',
-          dark: '#a60042',
+          DEFAULT: 'var(--color-primary)',
+          light: 'var(--color-primary-light)',
+          dark: 'var(--color-primary-dark)',
         },
-        background: '#f8f9fa',
-        surface: '#ffffff',
+        onPrimary: 'var(--color-on-primary)',
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
         text: {
-          DEFAULT: '#1a1a1a',
-          secondary: '#6b7280',
+          DEFAULT: 'var(--color-text)',
+          secondary: 'var(--color-text-secondary)',
         },
-        border: '#e5e7eb',
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
+        border: 'var(--color-border)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
       },
       fontFamily: {
         base: ['System', 'sans-serif'],

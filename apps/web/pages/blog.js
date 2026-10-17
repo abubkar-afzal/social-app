@@ -1,25 +1,71 @@
+import SEO from '@/components/SEO';
 import React from 'react';
 
-export default function Blog() {
-  const posts = [
-    { id: 1, title: '10 Tips for Better Photography', excerpt: 'Learn how to capture stunning photos with your phone.' },
-    { id: 2, title: 'The Future of Video Sharing', excerpt: 'Trends shaping the video content landscape.' },
-    { id: 3, title: 'Audio Storytelling', excerpt: 'Why audio is making a comeback in social media.' },
-  ];
+const POSTS = [
+  {
+    id: 1,
+    title: '10 Tips for Better Photography',
+    excerpt: 'Learn how to capture stunning photos with your phone, no professional gear required.',
+    date: 'Oct 12, 2026',
+    tag: 'Photography',
+  },
+  {
+    id: 2,
+    title: 'The Future of Video Sharing',
+    excerpt: 'Trends shaping the video content landscape over the next decade.',
+    date: 'Oct 5, 2026',
+    tag: 'Video',
+  },
+  {
+    id: 3,
+    title: 'Audio Storytelling is Back',
+    excerpt: 'Why audio is making a comeback in social media and how to make the most of it.',
+    date: 'Sep 28, 2026',
+    tag: 'Audio',
+  },
+  {
+    id: 4,
+    title: 'Building a Creator Community',
+    excerpt: 'Strategies for growing an engaged audience without burning out.',
+    date: 'Sep 20, 2026',
+    tag: 'Community',
+  },
+  {
+    id: 5,
+    title: 'How We Scale AR Media',
+    excerpt: 'A peek behind the curtain at our infrastructure and engineering decisions.',
+    date: 'Sep 15, 2026',
+    tag: 'Engineering',
+  },
+];
 
+export default function BlogPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
-        <h1 className="text-4xl font-bold text-text mb-6">Blog</h1>
-        <div className="space-y-6">
-          {posts.map((post) => (
-            <div key={post.id} className="bg-surface p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <h2 className="text-xl font-semibold text-text">{post.title}</h2>
-              <p className="text-text-secondary mt-2">{post.excerpt}</p>
+    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-3xl">
+            <SEO title="Blog" description="Stories and updates from AR Media." url="/blog" />
+
+      <h1 className="text-3xl sm:text-4xl font-bold text-text mb-2">Blog</h1>
+      <p className="text-base sm:text-lg text-text-secondary mb-8">
+        Stories, tips, and updates from the AR Media team.
+      </p>
+
+      <div className="space-y-4">
+        {POSTS.map((post) => (
+          <article key={post.id} className="bg-surface p-5 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+                {post.tag}
+              </span>
+              <span className="text-xs text-text-secondary">{post.date}</span>
             </div>
-          ))}
-        </div>
-      </main>
+            <h2 className="text-lg font-semibold text-text mb-1">{post.title}</h2>
+            <p className="text-sm text-text-secondary">{post.excerpt}</p>
+            <button className="text-primary text-sm font-medium mt-3 hover:underline">
+              Read more →
+            </button>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }

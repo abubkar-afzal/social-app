@@ -37,13 +37,11 @@ export const PRIMARY_PRESETS = [
   { name: 'Slate', value: '#475569' },
   { name: 'Black', value: '#000000' },
   { name: 'Dark', value: '#111827' },
+  { name: 'White', value: '#ffffff' },
 ];
 
 export const DEFAULT_PRIMARY = '#e6005c';
 
-/**
- * Lighten a hex color by adding `amount` to each RGB channel.
- */
 export function lighten(hex, amount = 60) {
   const num = parseInt(hex.replace('#', ''), 16);
   const r = Math.min(255, (num >> 16) + amount);
@@ -52,10 +50,6 @@ export function lighten(hex, amount = 60) {
   return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
 }
 
-/**
- * Darken a hex color by subtracting `amount` from each RGB channel.
- * If the color is very dark, we allow it to stay near-black (never negative).
- */
 export function darken(hex, amount = 40) {
   const num = parseInt(hex.replace('#', ''), 16);
   const r = Math.max(0, (num >> 16) - amount);
@@ -64,9 +58,23 @@ export function darken(hex, amount = 40) {
   return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
 }
 
-/**
- * Validate a hex color string.
- */
 export function isValidHex(hex) {
   return /^#([0-9A-Fa-f]{6})$/.test(hex);
+}
+
+/**
+ * Returns a readable text color (black or white) for a given background hex.
+ * Uses the sRGB relative luminance formula.
+ *   - Light backgrounds (luminance > 0.6) → dark text (#0a0a0a)
+ *   - Dark backgrounds → light text (#ffffff)
+ */
+export function readableTextColor(backgroundHex) {
+  if (!backgroundHex) return '#ffffff';
+  const hex = backgroundHex.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16) / 255;
+  const g = parseInt(hex.substr(2, 2), 16) / 255;
+  const b = parseInt(hex.substr(4, 2), 16) / 255;
+
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum > 0.6 ? '#0a0a0a' : '#ffffff';
 }

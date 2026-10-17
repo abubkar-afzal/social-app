@@ -14,8 +14,9 @@ import {
   Bars3Icon as MenuIcon,
 } from '../../icons';
 import { useAuth } from '../../utils/useAuth';
+import Image from 'next/image';
 
-export default function Navbar() {
+export default function Navbar({img}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -92,9 +93,12 @@ export default function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <span className="hidden sm:inline text-lg sm:text-xl font-semibold text-text">AR Media</span>
-              <span className="sm:hidden text-lg font-semibold text-primary">AR</span>
+              <Image src={img} alt="AR Media" width={60} height={60} className="rounded-full w-[2.5rem] h-[2.5rem] md:w-[4rem] md:h-[4rem]" />
             </Link>
+            <div className='md:hidden'></div>
+            <div className='md:hidden'></div>
+            <div className='md:hidden'></div>
+            <div className='md:hidden'></div>
             <div className='md:hidden'></div>
             <div className='md:hidden'></div>
             <div className='md:hidden'></div>

@@ -5,6 +5,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../utils/ThemeContext';
 import { PRIMARY_PRESETS, isValidHex } from '../../utils/themePresets';
+import InfoScreenLayout from './InfoScreenLayout';
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -24,9 +25,8 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="p-4">
-        <Text className="text-2xl font-bold text-text mb-6">Settings</Text>
+    <InfoScreenLayout title="Setting" subtitle="Customize the app's appearance and theme.">
+        
 
         {/* APPEARANCE */}
         <View className="bg-surface rounded-2xl p-4 mb-4">
@@ -122,7 +122,7 @@ export default function SettingsScreen() {
             <Text className="text-error text-center font-semibold">Reset to defaults</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </InfoScreenLayout>
+      
   );
 }

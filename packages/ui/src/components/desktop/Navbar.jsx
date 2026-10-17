@@ -12,7 +12,7 @@ import {
 } from '../../icons';
 import { useAuth } from '../../utils/useAuth';
 
-export default function DesktopNavbar() {
+export default function DesktopNavbar({ img }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [moreOpen, setMoreOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
@@ -61,8 +61,7 @@ export default function DesktopNavbar() {
       <div className="flex h-16 items-center justify-between px-6 gap-4">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-2xl font-bold text-primary"></span>
-          <span className="text-lg font-semibold text-text">AR Media</span>
+          <img src={img} alt="AR Media" className="rounded-full w-[2.5rem] h-[2.5rem] md:w-[4rem] md:h-[4rem]" />
         </Link>
 
         {/* Navigation */}

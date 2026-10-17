@@ -7,6 +7,7 @@ import {
   DEFAULT_PRIMARY,
   lighten,
   darken,
+  readableTextColor,
 } from './themePresets';
 
 const ThemeContext = createContext(null);
@@ -14,17 +15,9 @@ const ThemeContext = createContext(null);
 const MODE_KEY = 'theme_mode';
 const PRIMARY_KEY = 'theme_primary';
 
-/**
- * Detect whether we are running on web (browser or Electron renderer).
- * We avoid importing `Platform` from react-native so Next.js/Turbopack
- * doesn't try to parse React Native sources on the server/build.
- */
 const IS_WEB =
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
-/**
- * Convert #RRGGBB → "R G B" (space-separated channels for Tailwind alpha support).
- */
 function hexToRgbChannels(hex) {
   if (!hex) return '0 0 0';
   const cleaned = hex.replace('#', '');
@@ -35,12 +28,6 @@ function hexToRgbChannels(hex) {
   return `${r} ${g} ${b}`;
 }
 
-/**
- * Applies theme colors as CSS variables on the web.
- * Sets both:
- *   --color-primary        (hex, for direct CSS use)
- *   --color-primary-rgb    (channels, for Tailwind alpha support)
- */
 function applyCssVars(palette, primary) {
   if (!IS_WEB) return;
   const root = document.documentElement;
@@ -57,6 +44,7 @@ function applyCssVars(palette, primary) {
     ['--color-primary', primary],
     ['--color-primary-light', lighten(primary, 60)],
     ['--color-primary-dark', darken(primary, 40)],
+    ['--color-on-primary', readableTextColor(primary)],
   ];
 
   for (const [name, hex] of pairs) {
@@ -120,6 +108,9 @@ export function ThemeProvider({ children }) {
     }
   }, [palette, primary, resolvedMode]);
 
+  // NOTE: no appearance/colorScheme calls here — ThemeVars.jsx handles mobile
+  // by providing CSS variables through NativeWind's vars() API.
+
   const setMode = async (newMode) => {
     setModeState(newMode);
     try {
@@ -159,6 +150,7 @@ export function ThemeProvider({ children }) {
     resolvedMode,
     primaryLight: lighten(primary, 60),
     primaryDark: darken(primary, 40),
+    onPrimary: readableTextColor(primary),
     reset,
     ready,
   };
@@ -169,7 +161,6 @@ export function ThemeProvider({ children }) {
 export function useTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    // Safe fallback for components rendered outside the provider
     return {
       mode: 'light',
       setMode: () => {},
@@ -180,6 +171,7 @@ export function useTheme() {
       resolvedMode: 'light',
       primaryLight: lighten(DEFAULT_PRIMARY, 60),
       primaryDark: darken(DEFAULT_PRIMARY, 40),
+      onPrimary: readableTextColor(DEFAULT_PRIMARY),
       reset: () => {},
       ready: true,
     };

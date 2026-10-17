@@ -17,6 +17,7 @@
     "dist:linux": "vite build && electron-builder --linux"
   },
   "dependencies": {
+    "electron": "^44.9.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-easy-crop": "^6.2.3",
@@ -27,7 +28,6 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.0",
     "cross-env": "^7.0.3",
-    "electron": "44.7.0",
     "electron-builder": "^26.0.13",
     "postcss": "^8.4.47",
     "sharp": "^0.35.5",

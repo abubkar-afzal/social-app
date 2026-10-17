@@ -1,11 +1,25 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text } from 'react-native';
+import InfoScreenLayout from './InfoScreenLayout';
+
+const FAQ = [
+  { q: 'How do I upload content?', a: 'Tap "Create" in the navigation bar and select your media files.' },
+  { q: 'How do I report content?', a: 'Use the "Report" option on any media page.' },
+  { q: 'Can I delete my uploads?', a: 'Yes — go to Account, find the post, and tap the delete icon.' },
+  { q: 'How do I change my picture?', a: 'Go to Account → Edit Profile → tap the pencil icon.' },
+  { q: 'Is AR Media free?', a: 'Yes. Uploading, viewing, and sharing are free.' },
+  { q: 'How do I contact support?', a: 'Email support@armedia.app. We reply within 1–2 days.' },
+];
 
 export default function HelpScreen() {
   return (
-    <ScrollView className="flex-1 bg-background p-6">
-      <Text className="text-3xl font-bold text-text mb-4">About AR Media</Text>
-      <Text className="text-text-secondary text-lg">AR Media is a platform for discovering and sharing beautiful videos, photos, and audio.</Text>
-    </ScrollView>
+    <InfoScreenLayout title="Help Center" subtitle="Answers to common questions.">
+      {FAQ.map((item, i) => (
+        <View key={i} className="bg-surface rounded-xl p-4 mb-3">
+          <Text className="text-base font-semibold text-text mb-2">{item.q}</Text>
+          <Text className="text-sm text-text-secondary">{item.a}</Text>
+        </View>
+      ))}
+    </InfoScreenLayout>
   );
 }

@@ -1,21 +1,55 @@
+import SEO from '@/components/SEO';
 import React from 'react';
 
-export default function HelpCenter() {
+const FAQ = [
+  {
+    q: 'How do I upload content?',
+    a: 'Click the "Create" button in the navigation bar and select your media files. You can upload photos, videos, and audio.',
+  },
+  {
+    q: 'How do I report inappropriate content?',
+    a: 'Use the "Report" option on any media page or contact our support team. We review all reports within 24 hours.',
+  },
+  {
+    q: 'Can I delete my uploads?',
+    a: 'Yes. Go to your Account page, find the post you want to remove, and click the delete icon. Deletion is permanent.',
+  },
+  {
+    q: 'How do I change my profile picture?',
+    a: 'Go to your Account, click "Edit Profile", then click the pencil icon next to your avatar to upload a new picture.',
+  },
+  {
+    q: 'Is AR Media free to use?',
+    a: 'Yes. All core features including uploading, viewing, and sharing are free. We plan to keep it that way.',
+  },
+  {
+    q: 'How do I contact support?',
+    a: 'Email us at support@armedia.app. We typically respond within 1–2 business days.',
+  },
+];
+
+export default function HelpPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
-        <h1 className="text-4xl font-bold text-text mb-6">Help Center</h1>
-        <div className="space-y-4">
-          <div className="bg-surface p-6 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-text">How do I upload content?</h2>
-            <p className="text-text-secondary mt-2">Click the "Create" button in the navigation bar and select your media files.</p>
+    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-3xl">
+            <SEO title="Help Center" description="Get help with AR Media." url="/help" />
+
+      <h1 className="text-3xl sm:text-4xl font-bold text-text mb-2">Help Center</h1>
+      <p className="text-base sm:text-lg text-text-secondary mb-8">
+        Answers to common questions. Still stuck? Email{' '}
+        <a href="mailto:support@armedia.app" className="text-primary hover:underline">
+          support@armedia.app
+        </a>
+        .
+      </p>
+
+      <div className="space-y-4">
+        {FAQ.map((item, i) => (
+          <div key={i} className="bg-surface p-5 rounded-xl shadow-md">
+            <h2 className="text-base sm:text-lg font-semibold text-text mb-2">{item.q}</h2>
+            <p className="text-sm sm:text-base text-text-secondary">{item.a}</p>
           </div>
-          <div className="bg-surface p-6 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-text">How do I report inappropriate content?</h2>
-            <p className="text-text-secondary mt-2">Use the "Report" button on any media page or contact support.</p>
-          </div>
-        </div>
-      </main>
+        ))}
+      </div>
     </div>
   );
 }

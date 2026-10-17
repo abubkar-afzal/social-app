@@ -115,12 +115,12 @@ export default function MobileLogin() {
         </Text>
 
         <TouchableOpacity
-          className="bg-white border border-border rounded-lg py-3 mb-6 flex-row items-center justify-center"
+          className="bg-background border border-border rounded-lg py-3 mb-6 flex-row items-center justify-center"
           onPress={() => promptAsync()}
           disabled={!request || loading}
           style={{ opacity: !request || loading ? 0.6 : 1 }}
         >
-          <Text className="text-xl mr-2 font-bold" style={{ color: '#4285F4' }}>G</Text>
+          <Text className="text-xl mr-2 font-bold text-primary" >G</Text>
           <Text className="font-medium text-text">Continue with Google</Text>
         </TouchableOpacity>
 

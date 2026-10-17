@@ -32,7 +32,6 @@ export default function MobileFooter({ state, descriptors, navigation }) {
     { key: 'Videos', label: 'Videos', icon: '🎬', screen: 'Videos' },
     { key: 'Photos', label: 'Photos', icon: '🖼️', screen: 'Photos' },
     { key: 'Audio', label: 'Audio', icon: '🎵', screen: 'Audio' },
-    { key: 'Account', label: 'Profile', icon: '👤', screen: 'Account' },
   ];
 
   const handleTabPress = (screen) => {
@@ -67,7 +66,7 @@ export default function MobileFooter({ state, descriptors, navigation }) {
           className="flex-1 items-center"
           onPress={() => setMoreVisible(true)}
         >
-          <Text className="text-2xl">☰</Text>
+          <Text className="text-2xl text-text">☰</Text>
           <Text className="text-xs text-text-secondary">More</Text>
         </TouchableOpacity>
       </View>
@@ -79,12 +78,12 @@ export default function MobileFooter({ state, descriptors, navigation }) {
         visible={moreVisible}
         onRequestClose={() => setMoreVisible(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
+        <View className="flex-1 justify-end">
           <View className="bg-surface rounded-t-3xl p-6">
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-xl font-bold">Menu</Text>
+              <Text className="text-xl font-bold text-text">Menu</Text>
               <TouchableOpacity onPress={() => setMoreVisible(false)}>
-                <Text className="text-2xl">✕</Text>
+                <Text className="text-2xl text-text">✕</Text>
               </TouchableOpacity>
             </View>
 

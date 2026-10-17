@@ -24,10 +24,11 @@ import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage
 import DesktopSettingsPage from '../../packages/ui/src/components/desktop/SettingsPage';
 
 export default function App() {
+  const img = `../build/my_logo_remove.png`;
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        <DesktopNavbar />
+        <DesktopNavbar img={img}/>
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<DesktopHero />} />

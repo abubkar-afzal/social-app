@@ -272,10 +272,10 @@ export default function MobileAccount() {
 
   if (!user) {
     return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-xl font-bold text-text mb-4">Please sign in</Text>
+      <View className="bg-background flex-1 items-center justify-center px-6">
+        
         <TouchableOpacity onPress={() => navigation.navigate('Login')} className="bg-primary px-6 py-3 rounded-full">
-          <Text className="text-white font-semibold">Sign In</Text>
+          <Text className="text-white font-semibold">Sign In to continue</Text>
         </TouchableOpacity>
       </View>
     );

@@ -1,41 +1,56 @@
-import './global.css';
-import 'react-native-gesture-handler';
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import * as NavigationBar from 'expo-navigation-bar';
+import "./global.css";
+import "react-native-gesture-handler";
 
-import MobileNavbar from '../../packages/ui/src/components/mobile/Navbar';
-import MobileHero from '../../packages/ui/src/components/mobile/Hero';
-import MobileVideoGrid from '../../packages/ui/src/components/mobile/VideoGrid';
-import MobilePhotoGrid from '../../packages/ui/src/components/mobile/PhotoGrid';
-import MobileAudioGrid from '../../packages/ui/src/components/mobile/AudioGrid';
-import MobileMediaDetail from '../../packages/ui/src/components/mobile/MediaDetail';
-import MobileLogin from '../../packages/ui/src/components/mobile/LoginPage';
-import MobileAccount from '../../packages/ui/src/components/mobile/AccountPage';
-import MobileUploadMedia from '../../packages/ui/src/components/mobile/UploadMediaScreen';
-import MobileFavorites from '../../packages/ui/src/components/mobile/FavoritesScreen';
-import MobileFooter from '../../packages/ui/src/components/mobile/Footer';
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
+import { LogBox } from 'react-native';
 
-import AboutScreen from '../../packages/ui/src/components/mobile/AboutScreen';
-import CareersScreen from '../../packages/ui/src/components/mobile/CareersScreen';
-import PressScreen from '../../packages/ui/src/components/mobile/PressScreen';
-import BlogScreen from '../../packages/ui/src/components/mobile/BlogScreen';
-import HelpScreen from '../../packages/ui/src/components/mobile/HelpScreen';
-import GuidelinesScreen from '../../packages/ui/src/components/mobile/GuidelinesScreen';
-import PrivacyScreen from '../../packages/ui/src/components/mobile/PrivacyScreen';
-import TermsScreen from '../../packages/ui/src/components/mobile/TermsScreen';
-import { ThemeProvider } from '../../packages/ui/src/utils/ThemeContext';
-import SettingsScreen from '../../packages/ui/src/components/mobile/SettingsScreen';
+LogBox.ignoreLogs([
+  "It looks like you might be using shared value's .value inside reanimated inline style",
+  'Writing to `value` during component render',
+]);
+import React, { useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, Platform } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar";
+
+import MobileNavbar from "../../packages/ui/src/components/mobile/Navbar";
+import MobileHero from "../../packages/ui/src/components/mobile/Hero";
+import MobileVideoGrid from "../../packages/ui/src/components/mobile/VideoGrid";
+import MobilePhotoGrid from "../../packages/ui/src/components/mobile/PhotoGrid";
+import MobileAudioGrid from "../../packages/ui/src/components/mobile/AudioGrid";
+import MobileMediaDetail from "../../packages/ui/src/components/mobile/MediaDetail";
+import MobileLogin from "../../packages/ui/src/components/mobile/LoginPage";
+import MobileAccount from "../../packages/ui/src/components/mobile/AccountPage";
+import MobileUploadMedia from "../../packages/ui/src/components/mobile/UploadMediaScreen";
+import MobileFavorites from "../../packages/ui/src/components/mobile/FavoritesScreen";
+import MobileFooter from "../../packages/ui/src/components/mobile/Footer";
+
+import AboutScreen from "../../packages/ui/src/components/mobile/AboutScreen";
+import CareersScreen from "../../packages/ui/src/components/mobile/CareersScreen";
+import PressScreen from "../../packages/ui/src/components/mobile/PressScreen";
+import BlogScreen from "../../packages/ui/src/components/mobile/BlogScreen";
+import HelpScreen from "../../packages/ui/src/components/mobile/HelpScreen";
+import GuidelinesScreen from "../../packages/ui/src/components/mobile/GuidelinesScreen";
+import PrivacyScreen from "../../packages/ui/src/components/mobile/PrivacyScreen";
+import TermsScreen from "../../packages/ui/src/components/mobile/TermsScreen";
+import SettingsScreen from "../../packages/ui/src/components/mobile/SettingsScreen";
+import { ThemeProvider } from "../../packages/ui/src/utils/ThemeContext";
+import ThemeVars from "../../packages/ui/src/components/mobile/ThemeVars";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-import { setApiBaseUrl } from '../../packages/ui/src/utils/apiConfig';
-setApiBaseUrl('https://ar-media-sigma.vercel.app'); // ← change to your actual IP
-
+import { setApiBaseUrl } from "../../packages/ui/src/utils/apiConfig";
+setApiBaseUrl("https://ar-media-sigma.vercel.app"); // ← change to your actual IP
 /* -------------------------------------------------------------------------- */
 /*                            MAIN TAB SCREENS                                 */
 /* -------------------------------------------------------------------------- */
@@ -43,7 +58,7 @@ setApiBaseUrl('https://ar-media-sigma.vercel.app'); // ← change to your actual
 function HomeScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
+      <MobileNavbar logo={require("./assets/my_logo.jpg")} />
       <MobileHero />
     </View>
   );
@@ -52,7 +67,7 @@ function HomeScreen() {
 function VideosScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
+      <MobileNavbar logo={require("./assets/my_logo.jpg")} />
       <MobileVideoGrid />
     </View>
   );
@@ -61,7 +76,7 @@ function VideosScreen() {
 function PhotosScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
+      <MobileNavbar logo={require("./assets/my_logo.jpg")} />
       <MobilePhotoGrid />
     </View>
   );
@@ -70,7 +85,7 @@ function PhotosScreen() {
 function AudioScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
+      <MobileNavbar logo={require("./assets/my_logo.jpg")} />
       <MobileAudioGrid />
     </View>
   );
@@ -79,7 +94,7 @@ function AudioScreen() {
 function AccountScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
+      <MobileNavbar logo={require("./assets/my_logo.jpg")} />
       <MobileAccount />
     </View>
   );
@@ -110,11 +125,11 @@ function MainTabs() {
 function AboutPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <AboutScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -122,11 +137,11 @@ function AboutPage() {
 function CareersPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <CareersScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -134,11 +149,11 @@ function CareersPage() {
 function PressPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <PressScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -146,11 +161,11 @@ function PressPage() {
 function BlogPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <BlogScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -158,11 +173,11 @@ function BlogPage() {
 function HelpPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <HelpScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -170,11 +185,11 @@ function HelpPage() {
 function GuidelinesPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <GuidelinesScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -182,11 +197,11 @@ function GuidelinesPage() {
 function PrivacyPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <PrivacyScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
@@ -194,63 +209,84 @@ function PrivacyPage() {
 function TermsPage() {
   return (
     <View style={{ flex: 1 }}>
-      <MobileNavbar />
       <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
         <TermsScreen />
+        <MobileFooter />
       </View>
-      <MobileFooter />
     </View>
   );
 }
 
+function LoginPage() {
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
+        <MobileLogin />
+        <MobileFooter />
+      </View>
+    </View>
+  );
+}
+function SettingsPage() {
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <MobileNavbar logo={require("./assets/my_logo.jpg")} />
+        <SettingsScreen />
+        <MobileFooter />
+      </View>
+    </View>
+  );
+}
 /* -------------------------------------------------------------------------- */
 /*                                    APP                                      */
 /* -------------------------------------------------------------------------- */
 
 export default function App() {
   useEffect(() => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       try {
-        if (typeof NavigationBar.setVisibilityAsync === 'function') {
-          NavigationBar.setVisibilityAsync('hidden');
+        if (typeof NavigationBar.setVisibilityAsync === "function") {
+          NavigationBar.setVisibilityAsync("hidden");
         }
-        if (typeof NavigationBar.setBehaviorAsync === 'function') {
-          NavigationBar.setBehaviorAsync('overlay-swipe');
+        if (typeof NavigationBar.setBehaviorAsync === "function") {
+          NavigationBar.setBehaviorAsync("overlay-swipe");
         }
       } catch (error) {
-        console.warn('Failed to hide navigation bar:', error);
+        console.warn("Failed to hide navigation bar:", error);
       }
     }
   }, []);
 
   return (
-        <ThemeProvider>
+    <ThemeProvider>
+      <ThemeVars>
+        <NavigationContainer>
+          <StatusBar style="light" hidden={true} />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Main" component={MainTabs} />
 
-    <NavigationContainer>
-      <StatusBar style="light" hidden={true} />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Main" component={MainTabs} />
+            {/* Auth & detail pages */}
+            <Stack.Screen name="Login" component={LoginPage} />
+            <Stack.Screen name="MediaDetail" component={MobileMediaDetail} />
+            <Stack.Screen name="UploadMedia" component={MobileUploadMedia} />
+            <Stack.Screen name="Favorites" component={MobileFavorites} />
 
-        {/* Auth & detail pages */}
-        <Stack.Screen name="Login" component={MobileLogin} />
-        <Stack.Screen name="MediaDetail" component={MobileMediaDetail} />
-        <Stack.Screen name="UploadMedia" component={MobileUploadMedia} />
-        <Stack.Screen name="Favorites" component={MobileFavorites} />
-
-        {/* Extra pages — rendered with Navbar + Footer */}
-        <Stack.Screen name="About" component={AboutPage} />
-        <Stack.Screen name="Careers" component={CareersPage} />
-        <Stack.Screen name="Press" component={PressPage} />
-        <Stack.Screen name="Blog" component={BlogPage} />
-        <Stack.Screen name="Help" component={HelpPage} />
-        <Stack.Screen name="Guidelines" component={GuidelinesPage} />
-        <Stack.Screen name="Privacy" component={PrivacyPage} />
-        <Stack.Screen name="Terms" component={TermsPage} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-
-      </Stack.Navigator>
-    </NavigationContainer>
-        </ThemeProvider>
-
+            {/* Extra pages — rendered with Navbar + Footer */}
+            <Stack.Screen name="About" component={AboutPage} />
+            <Stack.Screen name="Careers" component={CareersPage} />
+            <Stack.Screen name="Press" component={PressPage} />
+            <Stack.Screen name="Blog" component={BlogPage} />
+            <Stack.Screen name="Help" component={HelpPage} />
+            <Stack.Screen name="Guidelines" component={GuidelinesPage} />
+            <Stack.Screen name="Privacy" component={PrivacyPage} />
+            <Stack.Screen name="Terms" component={TermsPage} />
+            <Stack.Screen name="Settings" component={SettingsPage} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ThemeVars>
+    </ThemeProvider>
   );
 }

@@ -26,6 +26,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-text mb-3 sm:mb-4">Resources</h3>
             <ul className="space-y-2 text-xs sm:text-sm text-text-secondary">
+              <li><Link href="/apps" className="hover:text-primary transition">Download Apps</Link></li>
               <li><Link href="/blog" className="hover:text-primary transition">Blog</Link></li>
               <li><Link href="/help" className="hover:text-primary transition">Help Center</Link></li>
               <li><Link href="/guidelines" className="hover:text-primary transition">Guidelines</Link></li>
@@ -36,7 +37,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs sm:text-sm text-text-secondary">
               <li><Link href="/privacy" className="hover:text-primary transition">Privacy</Link></li>
               <li><Link href="/terms" className="hover:text-primary transition">Terms</Link></li>
-              <li><Link href="/guidelines" className="hover:text-primary transition">Guidelines</Link></li>
+              
             </ul>
           </div>
         </div>
@@ -44,11 +45,7 @@ export default function Footer() {
           <p className="text-xs sm:text-sm text-text-secondary text-center md:text-left">
             © {new Date().getFullYear()} AR Media. All rights reserved.
           </p>
-          <div className="flex gap-4 sm:gap-6">
-            <a href="#" className="text-xs sm:text-sm text-text-secondary hover:text-primary transition">Twitter</a>
-            <a href="#" className="text-xs sm:text-sm text-text-secondary hover:text-primary transition">Instagram</a>
-            <a href="#" className="text-xs sm:text-sm text-text-secondary hover:text-primary transition">YouTube</a>
-          </div>
+          
         </div>
       </div>
     </footer>

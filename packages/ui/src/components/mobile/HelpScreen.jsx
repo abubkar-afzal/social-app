@@ -8,7 +8,7 @@ const FAQ = [
   { q: 'Can I delete my uploads?', a: 'Yes — go to Account, find the post, and tap the delete icon.' },
   { q: 'How do I change my picture?', a: 'Go to Account → Edit Profile → tap the pencil icon.' },
   { q: 'Is AR Media free?', a: 'Yes. Uploading, viewing, and sharing are free.' },
-  { q: 'How do I contact support?', a: 'Email support@armedia.app. We reply within 1–2 days.' },
+  { q: 'How do I contact support?', a: 'Email hafizabubakarafzal@gmail.com. We reply within 1–2 days.' },
 ];
 
 export default function HelpScreen() {

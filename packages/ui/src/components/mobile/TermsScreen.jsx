@@ -72,7 +72,7 @@ export default function TermsScreen() {
 
       <Text className="text-lg font-semibold text-text mb-2">11. Contact</Text>
       <Text className="text-sm text-text-secondary leading-6">
-        legal@armedia.app
+        hafizabubakarafzal@gmail.com
       </Text>
     </InfoScreenLayout>
   );

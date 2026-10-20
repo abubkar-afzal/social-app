@@ -14,12 +14,12 @@ export default function DesktopPressPage() {
           <p className="text-text-secondary">For press inquiries, interviews, or media requests:</p>
           <p className="text-text mt-3">
             Email:{' '}
-            <a href="mailto:press@armedia.app" className="text-primary hover:underline">
-              press@armedia.app
+            <a href="mailto:hafizabubakarafzal@gmail.com" className="text-primary hover:underline">
+              hafizabubakarafzal@gmail.com
             </a>
           </p>
           <p className="text-text mt-1">
-            Phone: <span className="font-mono">+92 (300) 123-4567</span>
+            Phone: <span className="font-mono">+923270972423</span>
           </p>
         </div>
 

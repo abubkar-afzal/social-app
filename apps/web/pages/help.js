@@ -24,7 +24,7 @@ const FAQ = [
   },
   {
     q: 'How do I contact support?',
-    a: 'Email us at support@armedia.app. We typically respond within 1–2 business days.',
+    a: 'Email us at hafizabubakarafzal@gmail.com. We typically respond within 1–2 business days.',
   },
 ];
 
@@ -36,8 +36,8 @@ export default function HelpPage() {
       <h1 className="text-3xl sm:text-4xl font-bold text-text mb-2">Help Center</h1>
       <p className="text-base sm:text-lg text-text-secondary mb-8">
         Answers to common questions. Still stuck? Email{' '}
-        <a href="mailto:support@armedia.app" className="text-primary hover:underline">
-          support@armedia.app
+        <a href="mailto:hafizabubakarafzal@gmail.com" className="text-primary hover:underline">
+          hafizabubakarafzal@gmail.com
         </a>
         .
       </p>

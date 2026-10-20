@@ -6,7 +6,7 @@ const FAQ = [
   { q: 'Can I delete my uploads?', a: 'Yes. Go to your Account page, find the post you want to remove, and click the delete icon.' },
   { q: 'How do I change my profile picture?', a: 'Go to your Account, click "Edit Profile", then click the pencil icon next to your avatar.' },
   { q: 'Is AR Media free to use?', a: 'Yes. All core features including uploading, viewing, and sharing are free.' },
-  { q: 'How do I contact support?', a: 'Email us at support@armedia.app. We typically respond within 1–2 business days.' },
+  { q: 'How do I contact support?', a: 'Email us at hafizabubakarafzal@gmail.com. We typically respond within 1–2 business days.' },
 ];
 
 export default function DesktopHelpPage() {
@@ -16,8 +16,8 @@ export default function DesktopHelpPage() {
         <h1 className="text-4xl font-bold text-text mb-2">Help Center</h1>
         <p className="text-lg text-text-secondary mb-8">
           Answers to common questions. Still stuck? Email{' '}
-          <a href="mailto:support@armedia.app" className="text-primary hover:underline">
-            support@armedia.app
+          <a href="mailto:hafizabubakarafzal@gmail.com" className="text-primary hover:underline">
+            hafizabubakarafzal@gmail.com
           </a>
           .
         </p>

@@ -62,7 +62,7 @@ export default function PrivacyScreen() {
 
       <Text className="text-lg font-semibold text-text mb-2">9. Contact</Text>
       <Text className="text-sm text-text-secondary leading-6">
-        privacy@armedia.app
+        hafizabubakarafzal@gmail.com
       </Text>
     </InfoScreenLayout>
   );

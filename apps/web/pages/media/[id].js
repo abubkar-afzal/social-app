@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import MediaDetail from '../../../../packages/ui/src/components/web/MediaDetail';
 import SEO from '../../components/SEO';
@@ -17,6 +17,7 @@ export async function getServerSideProps({ params }) {
 export default function MediaDetailPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [media, setMedia] = useState(null);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -28,7 +29,7 @@ export default function MediaDetailPage() {
         type="article"
       />
       <main className="flex-1">
-        {id && <MediaDetail mediaId={id} />}
+        {id && <MediaDetail mediaId={id} media={media} setMedia={setMedia} />}
       </main>
     </div>
   );

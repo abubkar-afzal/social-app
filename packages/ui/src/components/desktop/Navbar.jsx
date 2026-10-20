@@ -60,9 +60,27 @@ export default function DesktopNavbar({ img }) {
     <header className="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 gap-4">
         {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={img} alt="AR Media" className="rounded-full w-[2.5rem] h-[2.5rem] md:w-[4rem] md:h-[4rem]" />
-        </Link>
+        {/* Brand */}
+<Link to="/" className="flex items-center gap-2 shrink-0">
+  {img ? (
+    <img
+      src={img}
+      alt="AR Media logo"
+      className="rounded-full w-9 h-9 md:w-10 md:h-10 object-cover bg-background"
+      onError={(e) => {
+        // If the image fails to load, hide it so the fallback below appears
+        e.currentTarget.style.display = 'none';
+        e.currentTarget.nextSibling?.style?.setProperty('display', 'flex');
+      }}
+    />
+  ) : null}
+  {!img && (
+    <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-primary flex items-center justify-center text-onPrimary font-bold">
+      A
+    </div>
+  )}
+  <span className="hidden sm:inline text-lg font-bold text-primary">AR Media</span>
+</Link>
 
         {/* Navigation */}
         <nav className="flex items-center gap-1">
@@ -79,7 +97,7 @@ export default function DesktopNavbar({ img }) {
             Audio
           </Link>
 
-          <div className="relative" ref={moreRef}>
+          {/* <div className="relative" ref={moreRef}>
             <button
               onClick={() => setMoreOpen(!moreOpen)}
               className="flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium text-text hover:bg-background transition"
@@ -101,7 +119,7 @@ export default function DesktopNavbar({ img }) {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
         </nav>
 
         {/* Search */}

@@ -40,7 +40,7 @@ export default function DesktopFooter() {
   <ul className="space-y-2 text-sm text-text-secondary">
     <li><Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link></li>
     <li><Link to="/terms" className="hover:text-primary transition">Terms of Service</Link></li>
-    <li><Link to="/guidelines" className="hover:text-primary transition">Guidelines</Link></li>
+    
   </ul>
 </div>
         </div>

@@ -128,9 +128,8 @@ const getFileExtension = (mimeType) => {
   return map[mimeType] || '';
 };
 
-export default function MediaDetail({ mediaId }) {
+export default function MediaDetail({ mediaId, media, setMedia }) {
   const { user } = useAuth();
-  const [media, setMedia] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
 

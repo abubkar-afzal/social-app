@@ -101,8 +101,8 @@ export default function TermsPage() {
           <h2 className="text-xl sm:text-2xl font-semibold text-text mt-8 mb-3">11. Contact</h2>
           <p>
             Questions? Contact:
-            <a href="mailto:legal@armedia.app" className="text-primary hover:underline ml-1">
-              legal@armedia.app
+            <a href="mailto:hafizabubakarafzal@gmail.com" className="text-primary hover:underline ml-1">
+              hafizabubakarafzal@gmail.com
             </a>
           </p>
         </section>

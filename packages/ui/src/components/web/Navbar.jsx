@@ -13,6 +13,7 @@ import {
   XMarkIcon as CloseIcon,
   Bars3Icon as MenuIcon,
 } from '../../icons';
+import { ArrowDownTrayIcon as DownloadIcon } from '../../icons';
 import { useAuth } from '../../utils/useAuth';
 import Image from 'next/image';
 
@@ -64,6 +65,7 @@ export default function Navbar({img}) {
     { label: 'Videos', href: '/videos' },
     { label: 'Photos', href: '/photos' },
     { label: 'Audio', href: '/audio' },
+    { label: 'Download Apps', href: '/apps' },   // ← add this
     { label: 'Favorites', href: '/favorites' },
     { label: 'About', href: '/about' },
     { label: 'Blog', href: '/blog' },
@@ -145,6 +147,15 @@ export default function Navbar({img}) {
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               {user ? (
                 <>
+                <Link
+  href="/apps"
+  className={`px-3 lg:px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-1 ${
+    router.pathname === '/apps' ? 'bg-primary text-white' : 'text-text hover:bg-background'
+  }`}
+>
+  <DownloadIcon className="h-4 w-4" />
+  <span>Apps</span>
+</Link>
                   <Link
                     href="/uploadmedia"
                     className="hidden sm:flex items-center gap-1 rounded-full bg-primary text-white px-3 lg:px-4 py-2 text-sm font-medium hover:bg-primary-dark transition"

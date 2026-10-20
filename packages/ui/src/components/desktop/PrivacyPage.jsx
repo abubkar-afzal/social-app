@@ -86,8 +86,8 @@ export default function DesktopPrivacyPage() {
           <h2 className="text-xl sm:text-2xl font-semibold text-text mt-8 mb-3">10. Contact Us</h2>
           <p>
             For questions, contact:
-            <a href="mailto:privacy@armedia.app" className="text-primary hover:underline ml-1">
-              privacy@armedia.app
+            <a href="mailto:hafizabubakarafzal@gmail.com" className="text-primary hover:underline ml-1">
+              hafizabubakarafzal@gmail.com
             </a>
           </p>
         </section>

@@ -17,7 +17,6 @@
     "dist:linux": "vite build && electron-builder --linux"
   },
   "dependencies": {
-    "electron": "^44.9.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-easy-crop": "^6.2.3",
@@ -28,6 +27,7 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.0",
     "cross-env": "^7.0.3",
+    "electron": "44.9.0",
     "electron-builder": "^26.0.13",
     "postcss": "^8.4.47",
     "sharp": "^0.35.5",
@@ -38,6 +38,7 @@
   "build": {
     "appId": "com.armedia.app",
     "productName": "AR Media",
+    "electronVersion": "44.9.0",
     "copyright": "Copyright © 2026 AR Media",
     "directories": {
       "output": "release",
@@ -53,27 +54,21 @@
     "protocols": [
       {
         "name": "AR Media",
-        "schemes": [
-          "armedia"
-        ]
+        "schemes": ["armedia"]
       }
     ],
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ],
       "icon": "build/icon.ico",
       "protocols": [
         {
           "name": "AR Media",
-          "schemes": [
-            "armedia"
-          ]
+          "schemes": ["armedia"]
         }
       ]
     },
@@ -86,32 +81,24 @@
       "shortcutName": "AR Media"
     },
     "mac": {
-      "target": [
-        "dmg"
-      ],
+      "target": ["dmg"],
       "icon": "build/icon.icns",
       "category": "public.app-category.social-networking",
       "protocols": [
         {
           "name": "AR Media",
-          "schemes": [
-            "armedia"
-          ]
+          "schemes": ["armedia"]
         }
       ]
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
+      "target": ["AppImage"],
       "icon": "build/icon.png",
       "category": "Network",
       "protocols": [
         {
           "name": "AR Media",
-          "schemes": [
-            "armedia"
-          ]
+          "schemes": ["armedia"]
         }
       ]
     }

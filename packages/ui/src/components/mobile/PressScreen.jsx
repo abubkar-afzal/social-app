@@ -8,8 +8,8 @@ export default function PressScreen() {
       <View className="bg-surface rounded-xl p-4 mb-4">
         <Text className="text-base font-semibold text-text mb-3">Press Contact</Text>
         <Text className="text-sm text-text-secondary mb-2">For press inquiries:</Text>
-        <Text className="text-sm text-primary mb-1">press@armedia.app</Text>
-        <Text className="text-sm text-text font-mono">+92 (300) 123-4567</Text>
+        <Text className="text-sm text-primary mb-1">hafizabubakarafzal@gmail.com</Text>
+        <Text className="text-sm text-text font-mono">+923270972423</Text>
       </View>
 
       <View className="bg-surface rounded-xl p-4 mb-4">

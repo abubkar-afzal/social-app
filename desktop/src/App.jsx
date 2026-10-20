@@ -22,13 +22,13 @@ import DesktopGuidelinesPage from '../../packages/ui/src/components/desktop/Guid
 import DesktopPrivacyPage from '../../packages/ui/src/components/desktop/PrivacyPage';
 import DesktopTermsPage from '../../packages/ui/src/components/desktop/TermsPage';
 import DesktopSettingsPage from '../../packages/ui/src/components/desktop/SettingsPage';
+import logo from './assets/my_logo_remove.jpg';
 
 export default function App() {
-  const img = `../build/my_logo_remove.png`;
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        <DesktopNavbar img={img}/>
+        <DesktopNavbar img={logo}/>
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<DesktopHero />} />
